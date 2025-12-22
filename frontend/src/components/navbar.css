@@ -1,3 +1,7 @@
 .nav-bar{
-    
+    color: #fff !important;
+    background-color: rgba(8, 35, 63, 0.986);
+}
+.nav-link{
+    color: #fff !important;
 }

@@ -1,0 +1,132 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.tabela{
+  min-width: 120vh;
+}
+.table thead th{
+  border: none !important;
+  background-color: #202020;
+  border-bottom-width: 0.1px !important;
+}
+td{
+  color: rgba(255, 255, 255, 0.986) !important;
+}
+.texto-prin{
+  color: #fff;
+}
+
+.table-dark {
+  --bs-table-bg: #202020 !important;
+  border-radius: 20px;
+  border: none;
+}
+.btn{
+  color: #fff !important;
+  font-weight: bold !important;  
+}
+.textresult{
+  color: #888 !important;
+}
+
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.telacadastro{
+  background-color: #202020;
+  min-height:70vh;
+  min-width: 60vh;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.inputs{
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+  min-width: 20vh;
+  min-height: 30vh;
+}
+.input{
+  border-radius: 5px;
+}
+.button{
+  min-width: 25vh;
+  background-color: rgb(50, 138, 55);
+}
+.divisaoinputs{
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+  
+}
+.title{
+  text-align: center;
+  align-items: center;
+}
+/* Container do input */
+.form-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+/* Input */
+.form-control-custom {
+  width: 100%;
+  padding: 8px 8px;
+  font-size: 15px;
+  border: 1.5px solid #d0d5dd;
+  border-radius: 8px;
+  outline: none;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  color: #242424;
+}
+
+/* Placeholder suave */
+.form-control-custom::placeholder {
+  color: #98a2b3;
+  font-size: 14px;
+}
+
+/* Foco */
+.form-control-custom:focus {
+  border-color: #2563eb; /* azul corporativo */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Input com erro */
+.form-control-custom.error {
+  border-color: #dc2626;
+}
+.form-control-custom:focus + .form-label-custom,
+.form-control-custom:not(:placeholder-shown) + .form-label-custom {
+  top: -8px;
+  font-size: 12px;
+  color: #2563eb;
+}

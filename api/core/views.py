@@ -12,15 +12,13 @@ def produtoview(request):
 
     if request.method == 'GET':
         produtos = Produto.objects.all().values(
-            'id','referencia','descricao','preco'
+            'id','ativo','referencia','descricao','preco'
         )
         if not produtos.exists():
             return JsonResponse({'erro': 'Produto nao encontrado'},status=404)
         return JsonResponse(list(produtos),safe=False)
     else:
         return JsonResponse({'erro':'Metodo Nao Permitido'},status=405)
-
-        
 
 @csrf_exempt
 def cadastroproduto(request):
@@ -45,6 +43,7 @@ def cadastroproduto(request):
         )
         return JsonResponse({
             'id':produto.id,
+            'ativo':produto.ativo,
             'referencia':produto.referencia,
             'descricao':produto.descricao,
             'preco':produto.preco
@@ -63,6 +62,7 @@ def editarproduto(request,id):
         produto.save()
         return JsonResponse({
             'id':produto.id,
+            'ativo':produto.ativo,
             'referencia':produto.referencia,
             'descricao':produto.descricao,
             'preco':produto.preco
@@ -73,6 +73,7 @@ def editarproduto(request,id):
 
         return JsonResponse({
             'id':produto.id,
+            'ativo':produto.ativo,
             'referencia':produto.referencia,
             'descricao':produto.descricao,
             'preco':produto.preco

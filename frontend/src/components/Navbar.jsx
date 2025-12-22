@@ -1,25 +1,56 @@
+import { Link } from 'react-router-dom';
+import './navbar.css';
 
-
-import './navbar.css'
-
-function Navbar(){
+function Navbar() {
     return (
         <>
-        <nav className='navbar navbar-expand-lg navbar-dark bg-dark fixed-top'>
-            <div className='me-4'>
-                <h2 className='fw-bold gap-2 ms-3'>Logo</h2>
-            </div>
-            <div>
-                <ul className='navbar-nav ms-auto gap-3'>
-                    <li className='nav=item'><a className='nav-link active fw-bold' href="/">Home</a></li>
-                    <li className='nav=item'><a className='nav-link active fw-bold' href="/">Produtos</a></li>
-                    <li className='nav=item'><a className='nav-link active fw-bold' href="/">Link</a></li>
-                </ul>
-            </div>
-        </nav>
-        </>
-    )
+            <nav className="navbar  nav-bar navbar-expand-lg fixed-top">
+                <div className="container-fluid">
+                    {/* Logo */}
+                    <Link className="navbar-link fw-bold ms-3" to="/">
+                        Logo
+                    </Link>
 
+                    {/* Botão hamburger */}
+                    <button
+                        className="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav"
+                        aria-controls="navbarNav"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation"
+                    >
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+
+                    {/* Links do menu */}
+                    <div className="collapse navbar-collapse" id="navbarNav">
+                        <ul className="navbar-nav ms-auto gap-3 me-3">
+                            <li className="nav-item">
+                                <Link className="nav-link fw-bold" to="/">DashBoard</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link fw-bold" to="/produtos">Produtos</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link fw-bold" to="/">Vendas</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link fw-bold" to="/">Estoque</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link fw-bold" to="/">Clientes</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link fw-bold" to="/">Vendedores</Link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </>
+    );
 }
 
-export default Navbar
+export default Navbar;

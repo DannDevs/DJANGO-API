@@ -1,0 +1,1 @@
+Projeto LOJA COM DJANGO + REACT + JS

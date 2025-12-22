@@ -56,6 +56,7 @@ def editarproduto(request,id):
         data = json.loads(request.body)
         produto = get_object_or_404(Produto,id=id)
         
+        produto.ativo = data.get('ativo',produto.ativo)
         produto.referencia = data.get('referencia',produto.referencia)
         produto.descricao = data.get('descricao',produto.descricao)
         produto.preco = data.get('preco',produto.preco)

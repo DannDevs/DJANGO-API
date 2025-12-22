@@ -20,7 +20,8 @@ from core import views
  
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('produtos/',views.produtoview,name='produtos'),
-    path('produtos/cadastro/',views.cadastroproduto,name='cadastroproduto'),
-    path('produtos/<int:id>',views.editarproduto,name='editarproduto'),
+    path('produtos/',views.ProdutoView.as_view(),name='produtos'),
+    path('produtos/cadastro/',views.CadastroProduto.as_view(),name='cadastroproduto'),
+    path('produtos/<int:id>',views.ProdutoViewUnico.as_view(),name='editarproduto'),
+    path('produtos/<int:id>/ajuste',views.AjustarProduto.as_view(),name='ajustarestoque')
 ]

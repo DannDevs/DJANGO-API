@@ -1,8 +1,46 @@
 from rest_framework import serializers
-from .models import Produto,Movimento
+from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda
 from django.db import transaction
 
 
+# ------------- VENDA SERIALIZER -------------------
+
+
+class VendaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Venda
+        fields = ['id','status','cliente','vendedor','valor_total']
+
+# ------------- VENDEDOR SERIALIZER ----------------------
+
+class VendedorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vendedor
+        fields = ['id','ativo','nome']
+    def validate_nome(self,value):
+        if len(value) <= 3:
+            raise serializers.ValidationError("O nome deve ter mais de 3 caracteres")
+        return value
+
+# -------------- CLIENTE SERIALIZER ---------------------
+
+class ClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = ['id','ativo','nome']
+    def validate_nome(self,value):
+        if len(value) <= 3:
+            raise serializers.ValidationError("O nome deve ter mais de 3 caracteres")
+        return value
+
+class CadastroClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = ['id','ativo','nome']
+    def validate_nome(self,value):
+        if len(value) <= 3:
+            raise serializers.ValidationError("O nome deve ter mais de 3 caracteres")
+        return value
 
 class CadastroProdutoSerializer(serializers.ModelSerializer):
     
@@ -56,6 +94,7 @@ class ProdutoSerializer(serializers.ModelSerializer):
         return value 
 
 class AjusteProdutoSerializer(serializers.ModelSerializer):
+    
     tipo_mov = serializers.ChoiceField(
         choices=['E','S'],
         write_only=True
@@ -63,12 +102,13 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
     quantidade = serializers.DecimalField(max_digits=8,decimal_places=2,write_only=True)
     valor = serializers.DecimalField(max_digits=10,decimal_places=2,write_only=True)
 
-    saldo = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
-    preco = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
+    saldo_atual = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
+    preco_atual = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
+    tipo_movimento = serializers.CharField(read_only=True)
 
     class Meta:
         model = Produto
-        fields = ['quantidade','valor','tipo_mov','saldo','preco']
+        fields = ['tipo_mov','quantidade','valor','tipo_movimento','saldo_atual','preco_atual']
     
     def validate(self,data):
         tipo_mov = data.get('tipo_mov')
@@ -78,7 +118,7 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
         if  quantidade < 0:
             raise serializers.ValidationError({'Valor':'A Quantidade nao pode ser menor que zero'})
         if  valor < 0:
-            raise serializers.ValidationError({'Valor':'O Preço tem que ser maior que zero'})
+            raise serializers.ValidationError({'Valor':'O Preço tem que ser menor que zero'})
         return data
 
     def update(self,instance,validated_data):
@@ -87,36 +127,29 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
         tipo_mov = validated_data['tipo_mov']
 
         if tipo_mov == 'E':
-            instance.saldo += valor
+            instance.saldo += quantidade
             instance.preco += valor
-            instance.save()
 
-            Movimento.objects.create(
-                produto=instance,
-                tipo_mov=tipo_mov,
-                preco=instance.preco,
-                valor=instance.valor
-            )
-
-            return instance
         elif tipo_mov == 'S':
-            instance.saldo -= valor
+            instance.saldo -= quantidade
             instance.preco -= valor
-            instance.save()
-
             
-            Movimento.objects.create(
+        instance.save()
+
+        movimento = Movimento.objects.create(
                 produto=instance,
                 tipo_mov=tipo_mov,
-                quantidade_mov=valor,
-                valor_mov=instance.preco
+                quantidade_mov=quantidade,
+                valor_mov=valor
             )
 
-            return instance
+        print(instance)
+
+        instance.tipo_movimento = movimento.tipo_mov 
+        instance.saldo_atual = instance.saldo
+        instance.preco_atual = instance.preco
+
+        return instance
 
 
-        
-
-#   "preco": "30.00",
-#   "saldo": "97.00" 
-
+    

@@ -26,4 +26,12 @@ urlpatterns = [
     path('produtos/<int:id>/ajuste',views.AjustarProduto.as_view(),name='ajustarestoque'),
     path('movimentos/',views.VizualizarMovimento.as_view(),name='movimentos'),
     path('movimentos/<int:produto_id>',views.VizualizarMovimentoDoItem.as_view(),name='movimentoitem'),
+    path('clientes/',views.ClienteView.as_view(),name='clientes'),
+    path('clientes/<int:id>',views.ClienteEdit.as_view(),name='editarcliente'),
+    path('clientes/cadastro/',views.CadastroCliente.as_view(),name='cadastrocliente'),
+    path('vendedores/',views.VendedorView.as_view(),name='vendedores'),
+    path('vendedores/<int:id>',views.VendedorEdit.as_view(),name='editarvendedor'),
+    path('vendedores/cadastro/',views.CadastroVendedor.as_view(),name='cadastrovendedor'),
+    path('vendas/',views.VendaView.as_view(),name='vendas'),
+    path('vendas/gerarvenda',views.GerarVenda.as_view(),name='gerarvenda')
 ]

@@ -7,8 +7,12 @@ from rest_framework import status
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render,get_object_or_404
-from core.models import Produto
-from core.serializers import ProdutoSerializer,AjusteProdutoSerializer
+from core.models import Produto,Movimento
+from core.serializers import ProdutoSerializer,AjusteProdutoSerializer,CadastroProdutoSerializer,MovimentoSerializer
+
+def validadeprodutoexiste(produto_id):
+    return Produto.objects.get(id=produto_id).exist()
+
 
 # -------------- LISTAR PRODUTOS -------------------
 
@@ -46,9 +50,8 @@ class ProdutoViewUnico(APIView):
 # ------------ CADASTRO PRODUTO -------------------
 class CadastroProduto(APIView):
     def post(self,request):
-        serializer = ProdutoSerializer(data=request.data)
+        serializer = CadastroProdutoSerializer(data=request.data)
         if serializer.is_valid():
-            print(request.data)
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
@@ -62,3 +65,15 @@ class AjustarProduto(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+class VizualizarMovimento(APIView):
+    def get(self,request):
+        movimentos = Movimento.objects.all()
+        serializer = MovimentoSerializer(movimentos,many=True)
+        return Response(serializer.data)
+
+class VizualizarMovimentoDoItem(APIView):
+    def get(self,request,produto_id):
+        produto = get_object_or_404(Produto,id=produto_id)
+        movimentositem = Movimento.objects.filter(produto=produto)
+        serializer = MovimentoSerializer(movimentositem,many=True)
+        return Response(serializer.data)

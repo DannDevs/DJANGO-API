@@ -23,5 +23,7 @@ urlpatterns = [
     path('produtos/',views.ProdutoView.as_view(),name='produtos'),
     path('produtos/cadastro/',views.CadastroProduto.as_view(),name='cadastroproduto'),
     path('produtos/<int:id>',views.ProdutoViewUnico.as_view(),name='editarproduto'),
-    path('produtos/<int:id>/ajuste',views.AjustarProduto.as_view(),name='ajustarestoque')
+    path('produtos/<int:id>/ajuste',views.AjustarProduto.as_view(),name='ajustarestoque'),
+    path('movimentos/',views.VizualizarMovimento.as_view(),name='movimentos'),
+    path('movimentos/<int:produto_id>',views.VizualizarMovimentoDoItem.as_view(),name='movimentoitem'),
 ]

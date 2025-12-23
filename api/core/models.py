@@ -30,7 +30,16 @@ class Vendedor(AtivoMixin):
     nome = models.CharField(max_length=90)
      
 class Movimento(models.Model):
+
+    class Tipo(models.TextChoices):
+        ENTRADA = 'E','Entrada'
+        SAIDA = 'S','Saida'
+
     produto = models.ForeignKey(Produto,on_delete=models.CASCADE)
+    tipo_mov = models.CharField(max_length=1,choices=Tipo.choices)
+    quantidade_mov = models.DecimalField(max_digits=8,decimal_places=2)
+    valor_mov = models.DecimalField(max_digits=8,decimal_places=2)
+
 
 
 # class Venda(models.Model):

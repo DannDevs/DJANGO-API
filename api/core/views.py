@@ -145,7 +145,20 @@ class VendaView(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 class VendaViewItens(APIView):
-    pass
+    def get(self,request,idvenda):
+        itensvenda = ItemVenda.objects.filter(venda=idvenda)
+        serializer  = sz.ItemVendaSerializer(itensvenda,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class FaturarVenda(APIView):
+    def patch(self,request,id):
+        venda_faturar = get_object_or_404(Venda,id=id)
+        serializer = sz.VendaSerializer(venda_faturar,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
 
 class GerarVenda(APIView):
     def post(self,request):
@@ -156,5 +169,14 @@ class GerarVenda(APIView):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class GerarItemVenda(APIView):
-    def post(self,request):
-        pass
+    def post(self,request,id):
+        serializer  = sz.ItemVendaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    def get(self,request,id):
+        venda = get_object_or_404(Venda,id=id)
+        serializer = sz.VendaSerializer(venda)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+

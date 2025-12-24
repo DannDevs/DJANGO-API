@@ -33,5 +33,8 @@ urlpatterns = [
     path('vendedores/<int:id>',views.VendedorEdit.as_view(),name='editarvendedor'),
     path('vendedores/cadastro/',views.CadastroVendedor.as_view(),name='cadastrovendedor'),
     path('vendas/',views.VendaView.as_view(),name='vendas'),
-    path('vendas/gerarvenda',views.GerarVenda.as_view(),name='gerarvenda')
+    path('vendas/itens/<int:idvenda>',views.VendaViewItens.as_view(),name='itensvenda'),
+    path('vendas/gerarvenda/',views.GerarVenda.as_view(),name='gerarvenda'),
+    path('vendas/<int:id>',views.GerarItemVenda.as_view(),name='additemvenda'),
+    path('vendas/faturar/<int:id>',views.FaturarVenda.as_view(),name='faturar'),
 ]

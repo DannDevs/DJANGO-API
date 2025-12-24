@@ -3,13 +3,74 @@ from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda
 from django.db import transaction
 
 
+
+
+
+
 # ------------- VENDA SERIALIZER -------------------
 
+# -------------- VENDA ------------------
 
 class VendaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venda
         fields = ['id','status','cliente','vendedor','valor_total']
+    def validade_valor_total(self,value):
+        if value < 0:
+            raise serializers.ValidationError('detail: Valor nao pode ser Negativo')
+    def update(self,instance,validated_data):
+        status = validated_data['status']
+
+        if instance.status == 'A': 
+                instance.status = 'F'
+                instance.save()
+
+        elif instance.status == 'F':
+            raise serializers.ValidationError('detail: Pedido Já Faturado')
+
+        return instance
+
+# ------------ ITENS VENDA ------------------
+
+class ItemVendaSerializer(serializers.ModelSerializer):
+    
+    quantidade = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
+
+    class Meta:
+        model = ItemVenda
+        fields = ['venda','produto','valor_item','quantidade_item','quantidade']
+        
+    def validate_valor_item(self,value):
+        if value <= 0:
+            raise serializers.ValidationError('O Valor nao pode ser menor que zero')
+        return value
+    def validate_quantidate_item(self,value):
+        if value <= 0:
+            raise serializers.ValidationError('A Quantidade nao pode ser menor que zero')
+        return value    
+    
+    def create(self,validated_data):
+        venda = validated_data['venda']
+        produto = validated_data['produto']
+        quantidade = validated_data['quantidade_item']
+        valor = validated_data['valor_item']
+
+        if venda.status == 'F':
+            raise serializers.ValidationError('Pedido Já Faturado')
+
+        if produto.saldo < quantidade:
+            raise serializers.ValidationError('Saldo Do Produto Insuficiente')
+
+        venda.valor_total += valor
+        venda.save()
+
+        produto.saldo -= quantidade
+        produto.save()
+        
+        item = ItemVenda.objects.create(**validated_data)
+        
+        return item
+
 
 # ------------- VENDEDOR SERIALIZER ----------------------
 
@@ -17,6 +78,7 @@ class VendedorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendedor
         fields = ['id','ativo','nome']
+
     def validate_nome(self,value):
         if len(value) <= 3:
             raise serializers.ValidationError("O nome deve ter mais de 3 caracteres")
@@ -142,8 +204,6 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
                 quantidade_mov=quantidade,
                 valor_mov=valor
             )
-
-        print(instance)
 
         instance.tipo_movimento = movimento.tipo_mov 
         instance.saldo_atual = instance.saldo

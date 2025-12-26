@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link } from "react-router-dom"
-import { Table, Checkbox, Button, Menu, MenuDropdown, MenuLabel } from '@mantine/core';
+import { Table, Checkbox, Button, Menu, MenuDropdown, MenuLabel, Textarea, TextInput } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { showNotification } from "@mantine/notifications";
 import Navbar from '../components/navbar';
 import './Produto.css'
-import ArchiveIcon from '../components/icons/ArchiveIcons'
+import RefreshIcon from '../components/icons/RefreshIcon';
+import ArchiveIcon from '../components/icons/ArchiveIcons';
+import SearchIcon from '../components/icons/SearchIcon';
 function Produto() {
   const [produtos, setProdutos] = useState([]);
+
 
 
 
@@ -27,9 +30,13 @@ function Produto() {
   const ativar = (produto) => {
     if (produto.ativo === 'I') {
       fetch(`http://127.0.0.1:8000/produtos/${produto.id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ativo: 'A' }),
+      }).then(res => {
+        if (res.ok) {
+          carregarProdutos();
+        }
       })
         .then(() => {
           showNotification({
@@ -54,11 +61,47 @@ function Produto() {
           })
         })
     }
-    else{
-        showNotification({
-            title: 'Erro',
-            message: 'Produto Já esta Ativo.',
-            color: 'red',
+    else {
+      showNotification({
+        title: 'Erro',
+        message: 'Produto Já esta Ativo.',
+        color: 'red',
+        styles: (theme) => ({
+          closeButton: {
+            backgroundColor: '#202020',
+          },
+          root: {
+            backgroundColor: '#202020',
+            color: '#ffffffe5',
+          },
+          title: {
+            color: '#fff',
+          },
+        }),
+        radius: 'md',
+        autoClose: 3000,
+        icon: <IconX />,
+      })
+    }
+  }
+
+  const inativar = (produto) => {
+    if (produto.ativo == "A") {
+      fetch(`http://127.0.0.1:8000/produtos/${produto.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ativo: 'I' }),
+      })
+        .then(res => {
+          if (res.ok) {
+            carregarProdutos();
+          }
+        })
+        .then(() => {
+          showNotification({
+            title: 'Sucesso',
+            message: 'Produto Inativo com sucesso.',
+            color: 'green',
             styles: (theme) => ({
               closeButton: {
                 backgroundColor: '#202020',
@@ -73,40 +116,33 @@ function Produto() {
             }),
             radius: 'md',
             autoClose: 3000,
-            icon: <IconX />,
+            icon: <IconCheck />,
+
           })
-    }
-  }
-
-  const inativar = (produto) => {
-    fetch(`http://127.0.0.1:8000/produtos/${produto.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ativo: 'I' }),
-    })
-      .then(() => {
-        showNotification({
-          title: 'Sucesso!',
-          message: 'Produto Inativo com sucesso.',
-          color: 'green',
-          styles: (theme) => ({
-            closeButton: {
-              backgroundColor: '#202020',
-            },
-            root: {
-              backgroundColor: '#202020',
-              color: '#ffffffe5',
-            },
-            title: {
-              color: '#fff',
-            },
-          }),
-          radius: 'md',
-          autoClose: 3000,
-          icon: <IconCheck />,
-
         })
-      });
+    }
+    else {
+      showNotification({
+        title: 'Erro',
+        message: 'Produto ja inativo',
+        color: 'red',
+        styles: (theme) => ({
+          closeButton: {
+            backgroundColor: '#202020',
+          },
+          root: {
+            backgroundColor: '#202020',
+            color: '#ffffffe5',
+          },
+          title: {
+            color: '#fff',
+          },
+        }),
+        radius: 'md',
+        autoClose: 3000,
+        icon: <IconX />,
+      })
+    }
   };
 
 
@@ -139,6 +175,28 @@ function Produto() {
 
   }
 
+  function carregarProdutos() {
+    fetch(`http://127.0.0.1:8000/produtos/`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Erro HTTP" + res.status);
+        }
+        return res.json();
+      })
+      .then(data => setProdutos(data.produtos ?? data))
+  }
+
+  function filtrar(valor){
+    if(!valor){
+      carregarProdutos();
+      return
+    }
+    console.log(valor)
+    fetch(`http://127.0.0.1:8000/produtos/${valor}`)
+    .then(res => res.json())
+    .then(data=> setProdutos(data.produto ?? data))
+  }
+
   return (
     <>
       <Navbar />
@@ -150,22 +208,28 @@ function Produto() {
             <div className='menu me-3'>
 
             </div>
-            <div>
-            </div>
+          </div>
+          <div className='pesquisadiv d-flex'>
+            <TextInput></TextInput>
+            <Button variant='filled' className='ms-4' onClick={filtrar}><SearchIcon /></Button>
+          </div>
+          <div>
+            {<Button variant="filled" className='me-4' onClick={carregarProdutos}><RefreshIcon color="white" /></Button>}
             <Link to="/cadastro">
               <Button variant="filled">Cadastrar</Button>
             </Link>
           </div>
         </div>
 
-        <Table style={{ backgroundColor: '#202020cc', borderRadius:'10px'}} withRowBorders={false}>
-          <Table.Thead style={{borderRadius:'10px'}}>
-            <Table.Tr style={{ backgroundColor: '#202020',borderRadius:'10px' }}>
+        <Table style={{ backgroundColor: '#202020cc', borderRadius: '10px' }} withRowBorders={false}>
+          <Table.Thead style={{ borderRadius: '10px' }}>
+            <Table.Tr style={{ backgroundColor: '#202020', borderRadius: '10px' }}>
               <Table.Th className='text-center'>Ativo</Table.Th>
               <Table.Th className='text-center'>ID</Table.Th>
               <Table.Th className='text-center' >Referencia</Table.Th>
               <Table.Th className='text-center'>Descrição</Table.Th>
               <Table.Th className='text-center'>Preço</Table.Th>
+              <Table.Th className='text-center'>Estoque</Table.Th>
               <Table.Th className='text-center'>Açoes</Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -183,6 +247,7 @@ function Produto() {
                 <Table.Td>{produto.referencia}</Table.Td>
                 <Table.Td>{produto.descricao}</Table.Td>
                 <Table.Td>{produto.preco}</Table.Td>
+                <Table.Td>{produto.saldo}</Table.Td>
                 <Table.Td>
                   <Menu shadow='md'>
                     <Menu.Target>
@@ -192,6 +257,8 @@ function Produto() {
                       <Menu.Item onClick={() => deleteProduto(produto.id)}>Excluir</Menu.Item>
                       <Menu.Item onClick={() => ativar(produto)}>Ativar</Menu.Item>
                       <Menu.Item onClick={() => inativar(produto)}>Inativar</Menu.Item>
+                      <Menu.Item>
+                      <Link className='links' to={`/produto/ajuste/${produto.id}`}>Ajuste</Link></Menu.Item>
                     </MenuDropdown>
                   </Menu>
                 </Table.Td>

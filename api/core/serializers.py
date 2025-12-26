@@ -109,10 +109,7 @@ class CadastroProdutoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Produto
         fields = ['id','ativo','referencia','descricao','preco','saldo']
-        extra_kwargs = {
-            'ativo':{'required':True},
-            'saldo':{'required':True}
-        }
+
     def validate_preco(self,value):
         if value <= 0:
             raise serializers.ValidationError('Preço deve ser maior que zero')
@@ -145,10 +142,6 @@ class ProdutoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Produto
         fields = ['id','ativo','referencia','descricao','preco','saldo']
-        extra_kwargs = {
-            'ativo':{'required':True},
-            'saldo':{'required':True}
-        }
 
     def validate_preco(self,value):
         if value <= 0:

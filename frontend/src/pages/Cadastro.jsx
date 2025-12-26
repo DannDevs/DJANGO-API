@@ -114,7 +114,7 @@ function Cadastro() {
         </div>
         <div className="telacadastro">
           <div className="divisao-title">
-            <h2 className="title">Cadastro Cliente</h2>
+            <h2 className="title">Cadastro Produto</h2>
           </div>
           <form className="form" onSubmit={handleSubmit}>
             <div className="inputs">

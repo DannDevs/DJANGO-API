@@ -7,9 +7,10 @@ from rest_framework import status
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render,get_object_or_404
-from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda
+from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro
 # from core.serializers import ProdutoSerializer,AjusteProdutoSerializer,CadastroProdutoSerializer,MovimentoSerializer,ClienteSerializer,CadastroClienteSerializer,VendedorSerializer
 from core import serializers as sz
+from core import services as sv
 
 
 def validadeprodutoexiste(produto_id):
@@ -159,6 +160,15 @@ class FaturarVenda(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+class RFaturarVenda(APIView):
+    def patch(self,request,id):
+        venda_remfat = get_object_or_404(Venda,id=id)
+        serializer = sz.VendaRemSerializar(venda_remfat,data=request.data,partial=True)
+        if serializer.is_valid():    
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
 
 class GerarVenda(APIView):
     def post(self,request):
@@ -170,7 +180,8 @@ class GerarVenda(APIView):
 
 class GerarItemVenda(APIView):
     def post(self,request,id):
-        serializer  = sz.ItemVendaSerializer(data=request.data)
+        venda = get_object_or_404(Venda,id=id)
+        serializer  = sz.ItemVendaSerializer(data=request.data,context={'venda':venda})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
@@ -179,4 +190,45 @@ class GerarItemVenda(APIView):
         venda = get_object_or_404(Venda,id=id)
         serializer = sz.VendaSerializer(venda)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+# ------------------- FINANCEIRO -----------------
+
+class FinanceiroView(APIView):
+    def get(self,request):
+        duplicatas = Financeiro.objects.all()
+        serializer = sz.FinanceiroSerializer(duplicatas,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class FinanceiroBaixar(APIView):
+    def patch(self,request,id):
+        duplicata = get_object_or_404(Financeiro,id=id)
+        
+        serializer = sz.FinanceiroBaixarSerializer(data=request.data)
+        
+        serializer.is_valid(raise_exception=True)
+   
+        sv.FinanceiroBaixarService().execute(duplicata)
+
+        return Response({"detail":"Baixado Com Sucesso"},status=status.HTTP_200_OK)
+
+
+class FinanceiroEstornar(APIView):
+    def patch(self,request,id):
+        duplicata = get_object_or_404(Financeiro,id=id)
+        
+        serializer = sz.FinanceiroEstornarSerializer(data=request.data)
+        
+        serializer.is_valid(raise_exception=True)
+   
+        sv.FinanceiroEstornarService().execute(duplicata)
+
+        return Response({"detail":"Estornado Com Sucesso"},status=status.HTTP_200_OK)
+    
+
+class FinancerioEdit(APIView):
+    def get(self,request,id):
+        duplicata = get_object_or_404(Financeiro,id=id)
+        serializer = sz.FinanceiroSerializer(duplicata)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
 

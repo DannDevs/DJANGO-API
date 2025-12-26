@@ -1,32 +1,86 @@
 from rest_framework import serializers
-from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda
+from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro
 from django.db import transaction
+from django.shortcuts import render,get_object_or_404
 
 
 
 
+# ------------ FINANCERIO SERIALIZER ---------------
 
 
+class FinanceiroBaixarSerializer(serializers.Serializer):
+
+    def validate_pago(self,value):
+        if value != Financeiro.Pago.Pago:
+            raise serializers.ValidationError({"Pago":"Titulo ja está Pago"})
+
+    def validate_valor(self,value):
+        if value < 0:
+            raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
+        return value
+
+
+        
+
+class FinanceiroEstornarSerializer(serializers.Serializer):
+
+    def validate_pago(self,value):
+        if value != Financeiro.Pago.Aberto:
+            raise serializers.ValidationError({"detail":"Titulo já esta em aberto"})
+ 
+
+    def validate_valor(self,value):
+        if value < 0:
+            raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
+        return value
+
+
+
+class FinanceiroSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Financeiro
+        fields = ['id','pago','tipo','venda','cliente','vendedor','valor']
+
+    def validate_valor(self,value):
+        if value < 0:
+            raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
+        return value
+    
 # ------------- VENDA SERIALIZER -------------------
 
 # -------------- VENDA ------------------
 
-class VendaSerializer(serializers.ModelSerializer):
+class VendaRemSerializar(serializers.ModelSerializer):
+
+    financeiro = FinanceiroSerializer(
+        source='financeiro_set',
+        many=True,
+        read_only=True
+    )
+
     class Meta:
         model = Venda
-        fields = ['id','status','cliente','vendedor','valor_total']
+        fields = ['id','status','cliente','vendedor','valor_total','financeiro']
+    
     def validade_valor_total(self,value):
         if value < 0:
             raise serializers.ValidationError('detail: Valor nao pode ser Negativo')
+    
     def update(self,instance,validated_data):
-        status = validated_data['status']
 
-        if instance.status == 'A': 
-                instance.status = 'F'
-                instance.save()
+        if instance.financeiro_set.filter(pago='P').exists():
+            raise serializers.ValidationError({"detail":"Não e possivel remover a baixa da venda pois já possui financeiro baixado"})
 
-        elif instance.status == 'F':
-            raise serializers.ValidationError('detail: Pedido Já Faturado')
+
+        if instance.status == 'F': 
+            financa = get_object_or_404(Financeiro,venda=instance.id)
+            financa.delete()
+            instance.status = 'A'
+            instance.save()
+
+        elif instance.status == 'A':
+            raise serializers.ValidationError('detail: Pedido Já esta Aberto')
 
         return instance
 
@@ -38,7 +92,7 @@ class ItemVendaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ItemVenda
-        fields = ['venda','produto','valor_item','quantidade_item','quantidade']
+        fields = ['produto','valor_item','quantidade_item','quantidade']
         
     def validate_valor_item(self,value):
         if value <= 0:
@@ -50,27 +104,81 @@ class ItemVendaSerializer(serializers.ModelSerializer):
         return value    
     
     def create(self,validated_data):
-        venda = validated_data['venda']
+        venda = self.context['venda']
         produto = validated_data['produto']
         quantidade = validated_data['quantidade_item']
         valor = validated_data['valor_item']
 
         if venda.status == 'F':
-            raise serializers.ValidationError('Pedido Já Faturado')
+            raise serializers.ValidationError('detail: Pedido Já Faturado')
 
         if produto.saldo < quantidade:
             raise serializers.ValidationError('Saldo Do Produto Insuficiente')
 
-        venda.valor_total += valor
+        venda.valor_total += valor * quantidade
         venda.save()
 
         produto.saldo -= quantidade
         produto.save()
         
-        item = ItemVenda.objects.create(**validated_data)
+        item = ItemVenda.objects.create(
+            venda=venda,
+            **validated_data
+            )
+
+        Movimento.objects.create(
+            produto=produto,
+            tipo_mov='S',
+            quantidade_mov=quantidade,
+            valor_mov=valor
+        )
         
         return item
 
+
+
+class VendaSerializer(serializers.ModelSerializer):
+    
+    financeiro = FinanceiroSerializer(
+        source='financeiro_set',
+        many=True,
+        read_only=True
+    )
+    
+    itens = ItemVendaSerializer(
+        source ='itemvenda_set',
+        many=True,
+        read_only=True
+    )
+
+    class Meta:
+        model = Venda
+        fields = ['id','status','cliente','vendedor','valor_total','financeiro','itens']
+    def validate_valor_total(self,value):
+        if value < 0:
+            raise serializers.ValidationError('detail: Valor nao pode ser Negativo')
+    
+    def update(self,instance,validated_data):
+
+        if instance.status == 'A': 
+                instance.status = 'F'
+                instance.save()
+
+                Financeiro.objects.get_or_create(
+                    venda=instance,
+                    defaults={
+                        'cliente':instance.cliente,
+                        'vendedor':instance.vendedor,
+                        'venda':instance,
+                        'tipo':'R',
+                        'valor':instance.valor_total
+                    }
+                )
+
+        elif instance.status == 'F':
+            raise serializers.ValidationError('detail: Pedido Já Faturado')
+
+        return instance
 
 # ------------- VENDEDOR SERIALIZER ----------------------
 
@@ -135,7 +243,7 @@ class CadastroProdutoSerializer(serializers.ModelSerializer):
 class MovimentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movimento
-        fields = ['produto','tipo_mov','quantidade_mov','valor_mov']
+        fields = ['id','produto','tipo_mov','quantidade_mov','valor_mov']
 
 
 class ProdutoSerializer(serializers.ModelSerializer):

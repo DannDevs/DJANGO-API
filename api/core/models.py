@@ -57,6 +57,28 @@ class ItemVenda(models.Model):
     valor_item = models.DecimalField(max_digits=8,decimal_places=2)
     quantidade_item = models.DecimalField(max_digits=8,decimal_places=2)
 
+class Financeiro(models.Model):
+
+    class Pago(models.TextChoices):
+        Aberto = 'A','Aberto'
+        Pago = 'P','Pago'
+        Atrasado = 'E','Atrasado'
+    
+    class Tipo(models.TextChoices):
+        Pagar = 'P','Pagar'
+        Receber = 'R','Receber'
+
+
+    pago = models.CharField(max_length=1,choices=Pago.choices,default='A')
+    tipo = models.CharField(max_length=1,choices=Tipo.choices)
+    venda = models.ForeignKey(Venda,on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
+    valor = models.DecimalField(max_digits=10,decimal_places=2)
+
+class caixa_mov(models.Model):
+    pass
+
 
 
 

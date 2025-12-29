@@ -13,10 +13,6 @@ from core import serializers as sz
 from core import services as sv
 
 
-def validadeprodutoexiste(produto_id):
-    return Produto.objects.get(id=produto_id).exist()
-
-
 # -------------- LISTAR PRODUTOS -------------------
 
 class ProdutoView(APIView):
@@ -155,17 +151,25 @@ class FaturarVenda(APIView):
     def patch(self,request,id):
         venda_faturar = get_object_or_404(Venda,id=id)
         serializer = sz.VendaSerializer(venda_faturar,data=request.data,partial=True)
+        
         if serializer.is_valid():
-            serializer.save()
+            sv.VendaFaturarService.execute(
+                venda=venda_faturar,
+                data=serializer.validated_data
+                )
+            
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class RFaturarVenda(APIView):
+class EstornarVenda(APIView):
     def patch(self,request,id):
-        venda_remfat = get_object_or_404(Venda,id=id)
-        serializer = sz.VendaRemSerializar(venda_remfat,data=request.data,partial=True)
+        venda_estornar = get_object_or_404(Venda,id=id)
+        serializer = sz.VendaEstornarSerializar(venda_estornar,data=request.data,partial=True)
         if serializer.is_valid():    
-            serializer.save()
+            sv.VendaEstornarService.execute(
+                venda=venda_estornar,
+                data=serializer.validated_data
+            )
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
@@ -179,13 +183,16 @@ class GerarVenda(APIView):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class GerarItemVenda(APIView):
+
     def post(self,request,id):
         venda = get_object_or_404(Venda,id=id)
         serializer  = sz.ItemVendaSerializer(data=request.data,context={'venda':venda})
+
         if serializer.is_valid():
-            serializer.save()
+            sv.ItemVendaService.execute(venda=venda,data=serializer.validated_data)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
     def get(self,request,id):
         venda = get_object_or_404(Venda,id=id)
         serializer = sz.VendaSerializer(venda)
@@ -207,10 +214,9 @@ class FinanceiroBaixar(APIView):
         
         serializer.is_valid(raise_exception=True)
    
-        sv.FinanceiroBaixarService().execute(duplicata)
+        sv.FinanceiroBaixarService.execute(duplicata,data=serializer.validated_data)
 
         return Response({"detail":"Baixado Com Sucesso"},status=status.HTTP_200_OK)
-
 
 class FinanceiroEstornar(APIView):
     def patch(self,request,id):
@@ -220,7 +226,7 @@ class FinanceiroEstornar(APIView):
         
         serializer.is_valid(raise_exception=True)
    
-        sv.FinanceiroEstornarService().execute(duplicata)
+        sv.FinanceiroEstornarService.execute(duplicata,data=serializer.validated_data)
 
         return Response({"detail":"Estornado Com Sucesso"},status=status.HTTP_200_OK)
     
@@ -232,3 +238,4 @@ class FinancerioEdit(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 
+# ---------------------------------------------------------------------

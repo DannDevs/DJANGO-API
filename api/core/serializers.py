@@ -5,14 +5,13 @@ from django.shortcuts import render,get_object_or_404
 
 
 
-
 # ------------ FINANCERIO SERIALIZER ---------------
 
 
 class FinanceiroBaixarSerializer(serializers.Serializer):
 
     def validate_pago(self,value):
-        if value != Financeiro.Pago.Pago:
+        if value != Financeiro.Pago.PAGO:
             raise serializers.ValidationError({"Pago":"Titulo ja está Pago"})
 
     def validate_valor(self,value):
@@ -51,7 +50,7 @@ class FinanceiroSerializer(serializers.ModelSerializer):
 
 # -------------- VENDA ------------------
 
-class VendaRemSerializar(serializers.ModelSerializer):
+class VendaEstornarSerializar(serializers.ModelSerializer):
 
     financeiro = FinanceiroSerializer(
         source='financeiro_set',
@@ -70,7 +69,7 @@ class VendaRemSerializar(serializers.ModelSerializer):
     def update(self,instance,validated_data):
 
         if instance.financeiro_set.filter(pago='P').exists():
-            raise serializers.ValidationError({"detail":"Não e possivel remover a baixa da venda pois já possui financeiro baixado"})
+            raise serializers.ValidationError()
 
 
         if instance.status == 'F': 
@@ -103,39 +102,37 @@ class ItemVendaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('A Quantidade nao pode ser menor que zero')
         return value    
     
-    def create(self,validated_data):
-        venda = self.context['venda']
-        produto = validated_data['produto']
-        quantidade = validated_data['quantidade_item']
-        valor = validated_data['valor_item']
+    # def create(self,validated_data):
+    #     venda = self.context['venda']
+    #     produto = validated_data['produto']
+    #     quantidade = validated_data['quantidade_item']
+    #     valor = validated_data['valor_item']
 
-        if venda.status == 'F':
-            raise serializers.ValidationError('detail: Pedido Já Faturado')
+    #     if venda.status == 'F':
+    #         raise serializers.ValidationError('detail: Pedido Já Faturado')
 
-        if produto.saldo < quantidade:
-            raise serializers.ValidationError('Saldo Do Produto Insuficiente')
+    #     if produto.saldo < quantidade:
+    #         raise serializers.ValidationError('Saldo Do Produto Insuficiente')
 
-        venda.valor_total += valor * quantidade
-        venda.save()
+    #     venda.valor_total += valor * quantidade
+    #     venda.save()
 
-        produto.saldo -= quantidade
-        produto.save()
+    #     produto.saldo -= quantidade
+    #     produto.save()
         
-        item = ItemVenda.objects.create(
-            venda=venda,
-            **validated_data
-            )
+    #     item = ItemVenda.objects.create(
+    #         venda=venda,
+    #         **validated_data
+    #         )
 
-        Movimento.objects.create(
-            produto=produto,
-            tipo_mov='S',
-            quantidade_mov=quantidade,
-            valor_mov=valor
-        )
+    #     Movimento.objects.create(
+    #         produto=produto,
+    #         tipo_mov='S',
+    #         quantidade_mov=quantidade,
+    #         valor_mov=valor
+    #     )
         
-        return item
-
-
+    #     return item
 
 class VendaSerializer(serializers.ModelSerializer):
     
@@ -154,31 +151,10 @@ class VendaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venda
         fields = ['id','status','cliente','vendedor','valor_total','financeiro','itens']
+    
     def validate_valor_total(self,value):
         if value < 0:
             raise serializers.ValidationError('detail: Valor nao pode ser Negativo')
-    
-    def update(self,instance,validated_data):
-
-        if instance.status == 'A': 
-                instance.status = 'F'
-                instance.save()
-
-                Financeiro.objects.get_or_create(
-                    venda=instance,
-                    defaults={
-                        'cliente':instance.cliente,
-                        'vendedor':instance.vendedor,
-                        'venda':instance,
-                        'tipo':'R',
-                        'valor':instance.valor_total
-                    }
-                )
-
-        elif instance.status == 'F':
-            raise serializers.ValidationError('detail: Pedido Já Faturado')
-
-        return instance
 
 # ------------- VENDEDOR SERIALIZER ----------------------
 

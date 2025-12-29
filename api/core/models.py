@@ -60,13 +60,13 @@ class ItemVenda(models.Model):
 class Financeiro(models.Model):
 
     class Pago(models.TextChoices):
-        Aberto = 'A','Aberto'
-        Pago = 'P','Pago'
-        Atrasado = 'E','Atrasado'
+        ABERTO = 'A','Aberto'
+        PAGO = 'P','Pago'
+        ATRASADO = 'E','Atrasado'
     
     class Tipo(models.TextChoices):
-        Pagar = 'P','Pagar'
-        Receber = 'R','Receber'
+        PAGAR = 'P','Pagar'
+        RECEBER = 'R','Receber'
 
 
     pago = models.CharField(max_length=1,choices=Pago.choices,default='A')

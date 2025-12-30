@@ -173,13 +173,10 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
     )
     quantidade = serializers.DecimalField(max_digits=8,decimal_places=2,write_only=True)
     valor = serializers.DecimalField(max_digits=10,decimal_places=2,write_only=True)
-    saldo_atual = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
-    preco_atual = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
-    tipo_movimento = serializers.CharField(read_only=True)
 
     class Meta:
         model = Produto
-        fields = ['tipo_mov','quantidade','valor','tipo_movimento','saldo_atual','preco_atual']
+        fields = ['tipo_mov','quantidade','valor']
     
     def validate(self,data):
         tipo_mov = data.get('tipo_mov')
@@ -189,7 +186,7 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
         if  quantidade < 0:
             raise serializers.ValidationError({'Valor':'A Quantidade nao pode ser menor que zero'})
         if  valor < 0:
-            raise serializers.ValidationError({'Valor':'O Preço tem que ser menor que zero'})
+            raise serializers.ValidationError({'Valor':'O Preço nao pode ser menor que zero'})
         return data
 
   

@@ -61,8 +61,8 @@ class AjustarProduto(APIView):
         produto = get_object_or_404(Produto,id=id)
         serializer = sz.AjusteProdutoSerializer(produto,data=request.data)
         if serializer.is_valid():
-            sv.AjusteProdutoService.execute(produto,data=serializer.validated_data)
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            prod = sv.AjusteProdutoService.execute(produto,data=serializer.validated_data)
+            return Response(sz.AjusteProdutoSerializer(prod).data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 # ------------------- TABELA DE MOVIMENTOS ---------------

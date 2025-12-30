@@ -132,12 +132,26 @@ class AjusteProdutoService:
     @transaction.atomic
     def execute(produto: ml.Produto,data):
 
-        tipo_mov = data['']
+        tipo_mov = data["tipo_mov"]
+        quantidade = data["quantidade"]
+        valor = data["valor"]
 
-        if tipo_mov == "E":
-            
         if tipo_mov == "S":
+            produto.saldo -= quantidade
+        if tipo_mov == "E":
+            produto.saldo += quantidade
+        
+        produto.save()
 
+        movimento = ml.Movimento.objects.create(
+            produto=produto,
+            tipo_mov=tipo_mov,
+            quantidade_mov=quantidade,
+            valor_mov=valor
+        )
+
+        return produto
+            
 
 
 

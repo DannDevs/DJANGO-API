@@ -7,8 +7,8 @@ from rest_framework import status
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render,get_object_or_404
+
 from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro
-# from core.serializers import ProdutoSerializer,AjusteProdutoSerializer,CadastroProdutoSerializer,MovimentoSerializer,ClienteSerializer,CadastroClienteSerializer,VendedorSerializer
 from core import serializers as sz
 from core import services as sv
 
@@ -52,7 +52,7 @@ class CadastroProduto(APIView):
     def post(self,request):
         serializer = sz.CadastroProdutoSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            sv.ProdutoCadastroService.cadatro(data=serializer.validated_data)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
@@ -61,7 +61,7 @@ class AjustarProduto(APIView):
         produto = get_object_or_404(Produto,id=id)
         serializer = sz.AjusteProdutoSerializer(produto,data=request.data)
         if serializer.is_valid():
-            produto = serializer.save()
+            sv.AjusteProdutoService.execute(produto,data=serializer.validated_data)
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
@@ -189,8 +189,8 @@ class GerarItemVenda(APIView):
         serializer  = sz.ItemVendaSerializer(data=request.data,context={'venda':venda})
 
         if serializer.is_valid():
-            sv.ItemVendaService.execute(venda=venda,data=serializer.validated_data)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+            item = sv.ItemVendaService.execute(venda=venda,data=serializer.validated_data)
+            return Response(sz.ItemVendaSerializer(item).data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request,id):

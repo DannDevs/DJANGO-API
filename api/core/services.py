@@ -4,9 +4,23 @@ from rest_framework.exceptions import ValidationError
 from core import models as ml
 from django.shortcuts import render,get_object_or_404
 
+from decimal import Decimal
 
-
-
+class ProdutoCadastroService:
+    @staticmethod
+    @transaction.atomic
+    def cadatro(data):
+        
+        produto = ml.Produto.objects.create(
+            **data
+        )
+        movimento = ml.Movimento.objects.create(
+            produto=produto,
+            tipo_mov=ml.Movimento.Tipo.ENTRADA,
+            quantidade_mov=produto.saldo,
+            valor_mov=produto.preco
+        )
+        return produto
 
 
 class FinanceiroBaixarService:
@@ -75,8 +89,7 @@ class ItemVendaService:
     @staticmethod
     @transaction.atomic
     def execute(venda: ml.Venda,data):
-        
-        print(data)
+
         produto = data["produto"]
         quantidade = data["quantidade_item"]
         valor = data["valor_item"]
@@ -87,8 +100,9 @@ class ItemVendaService:
         if produto.saldo < quantidade:
             raise ValidationError({"detail":"Saldo Insuficiente"})
 
-        
-        venda.valor_total += valor * quantidade
+        total = valor * quantidade
+
+        venda.valor_total += total
         venda.save()
 
         produto.saldo -= quantidade
@@ -98,7 +112,8 @@ class ItemVendaService:
             venda=venda,
             produto=produto,
             valor_item=valor,
-            quantidade_item=quantidade
+            quantidade_item=quantidade,
+            sub_total=total
             )
 
         ml.Movimento.objects.create(
@@ -109,3 +124,75 @@ class ItemVendaService:
         )
         
         return item
+
+# ---------------- SERVICE AJUSTE PRODUTO --------
+
+class AjusteProdutoService:
+    @staticmethod
+    @transaction.atomic
+    def execute(produto: ml.Produto,data):
+
+        tipo_mov = data['']
+
+        if tipo_mov == "E":
+            
+        if tipo_mov == "S":
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#   def update(self,instance,validated_data):
+#         quantidade = validated_data['quantidade']
+#         valor = validated_data['valor']
+#         tipo_mov = validated_data['tipo_mov']
+
+#         if tipo_mov == 'E':
+#             instance.saldo += quantidade
+#             instance.preco += valor
+
+#         elif tipo_mov == 'S':
+#             instance.saldo -= quantidade
+#             instance.preco -= valor
+            
+#         instance.save()
+
+#         movimento = Movimento.objects.create(
+#                 produto=instance,
+#                 tipo_mov=tipo_mov,
+#                 quantidade_mov=quantidade,
+#                 valor_mov=valor
+#             )
+
+#         instance.tipo_movimento = movimento.tipo_mov 
+#         instance.saldo_atual = instance.saldo
+#         instance.preco_atual = instance.preco
+
+#         return instance

@@ -56,6 +56,7 @@ class ItemVenda(models.Model):
     produto = models.ForeignKey(Produto,on_delete=models.PROTECT)
     valor_item = models.DecimalField(max_digits=8,decimal_places=2)
     quantidade_item = models.DecimalField(max_digits=8,decimal_places=2)
+    sub_total = models.DecimalField(max_digits=8,decimal_places=2,default=0)
 
 class Financeiro(models.Model):
 

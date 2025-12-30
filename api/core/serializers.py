@@ -19,9 +19,6 @@ class FinanceiroBaixarSerializer(serializers.Serializer):
             raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
         return value
 
-
-        
-
 class FinanceiroEstornarSerializer(serializers.Serializer):
 
     def validate_pago(self,value):
@@ -33,8 +30,6 @@ class FinanceiroEstornarSerializer(serializers.Serializer):
         if value < 0:
             raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
         return value
-
-
 
 class FinanceiroSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,73 +61,25 @@ class VendaEstornarSerializar(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError('detail: Valor nao pode ser Negativo')
     
-    def update(self,instance,validated_data):
-
-        if instance.financeiro_set.filter(pago='P').exists():
-            raise serializers.ValidationError()
-
-
-        if instance.status == 'F': 
-            financa = get_object_or_404(Financeiro,venda=instance.id)
-            financa.delete()
-            instance.status = 'A'
-            instance.save()
-
-        elif instance.status == 'A':
-            raise serializers.ValidationError('detail: Pedido Já esta Aberto')
-
-        return instance
-
 # ------------ ITENS VENDA ------------------
 
 class ItemVendaSerializer(serializers.ModelSerializer):
     
-    quantidade = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
 
     class Meta:
         model = ItemVenda
-        fields = ['produto','valor_item','quantidade_item','quantidade']
+        fields = ['produto','valor_item','quantidade_item','sub_total']
+        read_only_fields = ['sub_total']
         
     def validate_valor_item(self,value):
         if value <= 0:
             raise serializers.ValidationError('O Valor nao pode ser menor que zero')
         return value
-    def validate_quantidate_item(self,value):
+    def validate_quantidade_item(self,value):
         if value <= 0:
             raise serializers.ValidationError('A Quantidade nao pode ser menor que zero')
         return value    
     
-    # def create(self,validated_data):
-    #     venda = self.context['venda']
-    #     produto = validated_data['produto']
-    #     quantidade = validated_data['quantidade_item']
-    #     valor = validated_data['valor_item']
-
-    #     if venda.status == 'F':
-    #         raise serializers.ValidationError('detail: Pedido Já Faturado')
-
-    #     if produto.saldo < quantidade:
-    #         raise serializers.ValidationError('Saldo Do Produto Insuficiente')
-
-    #     venda.valor_total += valor * quantidade
-    #     venda.save()
-
-    #     produto.saldo -= quantidade
-    #     produto.save()
-        
-    #     item = ItemVenda.objects.create(
-    #         venda=venda,
-    #         **validated_data
-    #         )
-
-    #     Movimento.objects.create(
-    #         produto=produto,
-    #         tipo_mov='S',
-    #         quantidade_mov=quantidade,
-    #         valor_mov=valor
-    #     )
-        
-    #     return item
 
 class VendaSerializer(serializers.ModelSerializer):
     
@@ -202,20 +149,6 @@ class CadastroProdutoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Quantidade deve ser maior que zero')
         return saldo
 
-    def create(self,validated_data):
-
-        with transaction.atomic():
-            produto = Produto.objects.create(
-                **validated_data
-            )
-            movimento = Movimento.objects.create(
-                produto=produto,
-                tipo_mov='E',
-                quantidade_mov=produto.saldo,
-                valor_mov = produto.preco
-            )
-        return produto
-
 class MovimentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movimento
@@ -240,7 +173,6 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
     )
     quantidade = serializers.DecimalField(max_digits=8,decimal_places=2,write_only=True)
     valor = serializers.DecimalField(max_digits=10,decimal_places=2,write_only=True)
-
     saldo_atual = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
     preco_atual = serializers.DecimalField(max_digits=10,decimal_places=2,read_only=True)
     tipo_movimento = serializers.CharField(read_only=True)
@@ -260,33 +192,7 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'Valor':'O Preço tem que ser menor que zero'})
         return data
 
-    def update(self,instance,validated_data):
-        quantidade = validated_data['quantidade']
-        valor = validated_data['valor']
-        tipo_mov = validated_data['tipo_mov']
-
-        if tipo_mov == 'E':
-            instance.saldo += quantidade
-            instance.preco += valor
-
-        elif tipo_mov == 'S':
-            instance.saldo -= quantidade
-            instance.preco -= valor
-            
-        instance.save()
-
-        movimento = Movimento.objects.create(
-                produto=instance,
-                tipo_mov=tipo_mov,
-                quantidade_mov=quantidade,
-                valor_mov=valor
-            )
-
-        instance.tipo_movimento = movimento.tipo_mov 
-        instance.saldo_atual = instance.saldo
-        instance.preco_atual = instance.preco
-
-        return instance
+  
 
 
     

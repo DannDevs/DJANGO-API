@@ -1,5 +1,9 @@
 from django.db import models
 
+# class Usuario():
+#     pass
+
+
 class AtivoMixin(models.Model):
 
     class Status(models.TextChoices):
@@ -77,8 +81,9 @@ class Financeiro(models.Model):
     vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
     valor = models.DecimalField(max_digits=10,decimal_places=2)
 
-class caixa_mov(models.Model):
-    pass
+
+# class caixa_mov(models.Model):
+#     pass
 
 
 

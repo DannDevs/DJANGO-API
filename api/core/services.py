@@ -72,16 +72,20 @@ class VendaFaturarService:
         if venda.status == ml.Venda.TipoVenda.FATURADO:
             raise ValidationError("Venda já Faturada")
         
+
+        ml.Financeiro.objects.create(
+                    cliente=venda.cliente,
+                    vendedor=venda.vendedor,
+                    venda=venda,
+                    tipo='R',
+                    valor=venda.valor_total
+                )
+
+
         venda.status = ml.Venda.TipoVenda.FATURADO
         venda.save()
 
-        ml.Financeiro.objects.create(
-                cliente=venda.cliente,
-                vendedor=venda.vendedor,
-                venda=venda,
-                tipo='R',
-                valor=venda.valor_total
-                )
+       
 
         return venda
 
@@ -151,62 +155,4 @@ class AjusteProdutoService:
         )
 
         return produto
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#   def update(self,instance,validated_data):
-#         quantidade = validated_data['quantidade']
-#         valor = validated_data['valor']
-#         tipo_mov = validated_data['tipo_mov']
-
-#         if tipo_mov == 'E':
-#             instance.saldo += quantidade
-#             instance.preco += valor
-
-#         elif tipo_mov == 'S':
-#             instance.saldo -= quantidade
-#             instance.preco -= valor
-            
-#         instance.save()
-
-#         movimento = Movimento.objects.create(
-#                 produto=instance,
-#                 tipo_mov=tipo_mov,
-#                 quantidade_mov=quantidade,
-#                 valor_mov=valor
-#             )
-
-#         instance.tipo_movimento = movimento.tipo_mov 
-#         instance.saldo_atual = instance.saldo
-#         instance.preco_atual = instance.preco
-
-#         return instance
+        

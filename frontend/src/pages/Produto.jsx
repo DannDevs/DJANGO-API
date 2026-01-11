@@ -26,8 +26,7 @@ function Produto() {
       .catch(err => console.log(err));
   }, []);
 
-
-  const ativar = (produto) => {
+const ativar = (produto) => {
     if (produto.ativo === 'I') {
       fetch(`http://127.0.0.1:8000/produtos/${produto.id}`, {
         method: 'PATCH',
@@ -61,7 +60,7 @@ function Produto() {
           })
         })
     }
-    else {
+else {
       showNotification({
         title: 'Erro',
         message: 'Produto Já esta Ativo.',
@@ -85,7 +84,7 @@ function Produto() {
     }
   }
 
-  const inativar = (produto) => {
+const inativar = (produto) => {
     if (produto.ativo == "A") {
       fetch(`http://127.0.0.1:8000/produtos/${produto.id}`, {
         method: 'PATCH',
@@ -121,7 +120,7 @@ function Produto() {
           })
         })
     }
-    else {
+else {
       showNotification({
         title: 'Erro',
         message: 'Produto ja inativo',
@@ -145,10 +144,8 @@ function Produto() {
     }
   };
 
-
-
   const deleteProduto = (id) => {
-    fetch(`http://127.0.0.1:8000/produtos/${id}`, { method: 'DELETE' })
+      fetch(`http://127.0.0.1:8000/produtos/${id}`, { method: 'DELETE' })
       .then(() => {
         setProdutos(produtos.filter(p => p.id !== id))
         showNotification({
@@ -176,7 +173,7 @@ function Produto() {
   }
 
   function carregarProdutos() {
-    fetch(`http://127.0.0.1:8000/produtos/`)
+      fetch(`http://127.0.0.1:8000/produtos/`)
       .then(res => {
         if (!res.ok) {
           throw new Error("Erro HTTP" + res.status);

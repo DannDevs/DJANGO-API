@@ -71,14 +71,14 @@ class VizualizarMovimento(APIView):
     def get(self,request):
         movimentos = Movimento.objects.all()
         serializer = sz.MovimentoSerializer(movimentos,many=True)
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 class VizualizarMovimentoDoItem(APIView):
     def get(self,request,produto_id):
         produto = get_object_or_404(Produto,id=produto_id)
         movimentositem = Movimento.objects.filter(produto=produto)
         serializer = sz.MovimentoSerializer(movimentositem,many=True)
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 # ----------------- CLIENTES - MOV ----------------
 
@@ -225,9 +225,8 @@ class FinanceiroEstornar(APIView):
         serializer = sz.FinanceiroEstornarSerializer(data=request.data)
         
         serializer.is_valid(raise_exception=True)
-   
-        sv.FinanceiroEstornarService.execute(duplicata,data=serializer.validated_data)
 
+        sv.FinanceiroEstornarService.execute(duplicata,data=serializer.validated_data)
         return Response({"detail":"Estornado Com Sucesso"},status=status.HTTP_200_OK)
     
 

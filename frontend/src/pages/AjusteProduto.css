@@ -13,3 +13,16 @@ input, select,option {
 .mantine-Select-dropdown {
   background-color: white !important;
 }
+
+.gridmovimentos{
+  width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.inputq{
+  width: 25vh;
+}
+.btnmov{
+  width: 25vh !important;
+}

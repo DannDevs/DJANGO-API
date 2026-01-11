@@ -149,11 +149,6 @@ class CadastroProdutoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Quantidade deve ser maior que zero')
         return saldo
 
-class MovimentoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Movimento
-        fields = ['id','produto','tipo_mov','quantidade_mov','valor_mov']
-
 
 class ProdutoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -164,6 +159,20 @@ class ProdutoSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError('Preço Deve ser Maior que zero')
         return value 
+
+class MovimentoSerializer(serializers.ModelSerializer):
+
+    produto_nome = serializers.CharField(
+        source='produto.descricao',
+        read_only=True
+    )
+    print(produto_nome)
+    class Meta:
+        model = Movimento
+        fields = ['id','produto','produto_nome','tipo_mov','quantidade_mov','valor_mov']
+
+
+
 
 class AjusteProdutoSerializer(serializers.ModelSerializer):
     

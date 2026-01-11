@@ -1,12 +1,11 @@
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
-
 from core import models as ml
 from django.shortcuts import render,get_object_or_404
-
 from decimal import Decimal
 
 class ProdutoCadastroService:
+    
     @staticmethod
     @transaction.atomic
     def cadatro(data):
@@ -24,6 +23,7 @@ class ProdutoCadastroService:
 
 
 class FinanceiroBaixarService:
+    
     @staticmethod
     @transaction.atomic
     def execute(financeiro: ml.Financeiro,data):
@@ -36,6 +36,7 @@ class FinanceiroBaixarService:
 
     
 class FinanceiroEstornarService:
+    
     @staticmethod
     @transaction.atomic
     def execute(financeiro: ml.Financeiro,data):
@@ -47,6 +48,7 @@ class FinanceiroEstornarService:
         return financeiro
 
 class VendaEstornarService:
+    
     @staticmethod
     @transaction.atomic
     def execute(venda: ml.Venda,data):
@@ -90,6 +92,7 @@ class VendaFaturarService:
         return venda
 
 class ItemVendaService:
+    
     @staticmethod
     @transaction.atomic
     def execute(venda: ml.Venda,data):
@@ -126,12 +129,13 @@ class ItemVendaService:
             quantidade_mov=quantidade,
             valor_mov=valor
         )
-        
+
         return item
 
 # ---------------- SERVICE AJUSTE PRODUTO --------
 
 class AjusteProdutoService:
+    
     @staticmethod
     @transaction.atomic
     def execute(produto: ml.Produto,data):
@@ -141,6 +145,8 @@ class AjusteProdutoService:
         valor = data["valor"]
 
         if tipo_mov == "S":
+            if produto.saldo < quantidade:
+                raise ValidationError({"detail: Saldo Insuficiente"})
             produto.saldo -= quantidade
         if tipo_mov == "E":
             produto.saldo += quantidade

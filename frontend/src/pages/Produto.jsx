@@ -258,7 +258,7 @@ function Produto() {
                       <Menu.Item onClick={() => ativar(produto)}>Ativar</Menu.Item>
                       <Menu.Item onClick={() => inativar(produto)}>Inativar</Menu.Item>
                       <Menu.Item>
-                      <Link className='links' to={`/produto/ajuste/${produto.id}`}>Ajuste</Link></Menu.Item>
+                      <Link className='links' to={`/produtos/ajuste/${produto.id}`}>Ajuste</Link></Menu.Item>
                     </MenuDropdown>
                   </Menu>
                 </Table.Td>

@@ -1,0 +1,15 @@
+input, select,option { 
+    color: black !important; 
+}
+.mantine-Select-option {
+  color: black !important;
+}
+
+.mantine-Select-input {
+  color: black !important;
+  background-color: white !important;
+}
+
+.mantine-Select-dropdown {
+  background-color: white !important;
+}

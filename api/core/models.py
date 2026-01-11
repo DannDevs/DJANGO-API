@@ -1,5 +1,9 @@
 from django.db import models
 
+# class Usuario():
+#     pass
+
+
 class AtivoMixin(models.Model):
 
     class Status(models.TextChoices):
@@ -56,17 +60,18 @@ class ItemVenda(models.Model):
     produto = models.ForeignKey(Produto,on_delete=models.PROTECT)
     valor_item = models.DecimalField(max_digits=8,decimal_places=2)
     quantidade_item = models.DecimalField(max_digits=8,decimal_places=2)
+    sub_total = models.DecimalField(max_digits=8,decimal_places=2,default=0)
 
 class Financeiro(models.Model):
 
     class Pago(models.TextChoices):
-        Aberto = 'A','Aberto'
-        Pago = 'P','Pago'
-        Atrasado = 'E','Atrasado'
+        ABERTO = 'A','Aberto'
+        PAGO = 'P','Pago'
+        ATRASADO = 'E','Atrasado'
     
     class Tipo(models.TextChoices):
-        Pagar = 'P','Pagar'
-        Receber = 'R','Receber'
+        PAGAR = 'P','Pagar'
+        RECEBER = 'R','Receber'
 
 
     pago = models.CharField(max_length=1,choices=Pago.choices,default='A')
@@ -76,8 +81,9 @@ class Financeiro(models.Model):
     vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
     valor = models.DecimalField(max_digits=10,decimal_places=2)
 
-class caixa_mov(models.Model):
-    pass
+
+# class caixa_mov(models.Model):
+#     pass
 
 
 

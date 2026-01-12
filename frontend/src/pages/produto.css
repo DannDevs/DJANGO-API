@@ -56,14 +56,15 @@ td{
 }
 
 .telacadastro{
-  background-color: #202020;
+  background-color: #2d2c2c;
   min-height:70vh;
   min-width: 60vh;
-  border-radius: 40px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  border: 0.5px solid white
 }
 .inputs{
   display: flex;
@@ -71,6 +72,7 @@ td{
   flex-direction: column;
   min-width: 20vh;
   min-height: 30vh;
+
 }
 .input{
   border-radius: 5px;
@@ -132,4 +134,7 @@ td{
 }
 a{
   color: #202020 !important;
+}
+.btns{
+  width: 200px !important;
 }

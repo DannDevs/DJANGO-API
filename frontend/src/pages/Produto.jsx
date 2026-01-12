@@ -3,8 +3,8 @@ import { Link } from "react-router-dom"
 import { Table, Checkbox, Button, Menu, MenuDropdown, MenuLabel, Textarea, TextInput } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { showNotification } from "@mantine/notifications";
-import Navbar from '../components/navbar';
-import './Produto.css'
+import Navbar from '../components/Navbar';
+import './produto.css'
 import RefreshIcon from '../components/icons/RefreshIcon';
 import ArchiveIcon from '../components/icons/ArchiveIcons';
 import SearchIcon from '../components/icons/SearchIcon';
@@ -212,7 +212,7 @@ else {
           </div>
           <div>
             {<Button variant="filled" className='me-4' onClick={carregarProdutos}><RefreshIcon color="white" /></Button>}
-            <Link to="/cadastro">
+            <Link to="/produto/cadastro">
               <Button variant="filled">Cadastrar</Button>
             </Link>
           </div>

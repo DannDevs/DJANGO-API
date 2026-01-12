@@ -1,4 +1,4 @@
-import Navbar from "../components/navbar";
+import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react"; 
 import { showNotification } from "@mantine/notifications";
@@ -112,7 +112,7 @@ function Cadastro() {
             <Button filled>Retornar</Button>
           </Link>
         </div>
-        <div className="telacadastro">
+        <div className="telacadastro mt-3">
           <div className="divisao-title">
             <h2 className="title">Cadastro Produto</h2>
           </div>
@@ -123,7 +123,6 @@ function Cadastro() {
                 <input
                   className="input form-control-custom"
                   name="referencia"
-                  onChange={handleChange}
                   type="text"
                 />
               </div>
@@ -138,7 +137,7 @@ function Cadastro() {
                 />
               </div>
               <div className="divisaoinputs">
-                <label className="fw-bold form-label-custom">Preço</label>
+                <label className="fw-bold form-label-custom">Preço Venda</label>
                 <input
                   onChange={handleChange}
                   name="preco"
@@ -148,10 +147,10 @@ function Cadastro() {
                 />
               </div>
             </div>
-            <div className="buttons">
-              <button type="submit" disabled={disabled} className="button btn-sucess">
-                {disabled ? 'Enviando...' : 'Cadastrar'}
-              </button>
+            <div className="buttons mt-3">
+              <Button className="btns" filled disabled={disabled}>
+              {disabled ? 'Enviando...' : 'Cadastrar'}
+              </Button>
             </div>
           </form>
         </div>

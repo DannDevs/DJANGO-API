@@ -34,7 +34,7 @@ function Navbar() {
                                 <Link className="nav-link fw-bold" to="/produtos">Produtos</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link fw-bold" to="/">Vendas</Link>
+                                <Link className="nav-link fw-bold" to="/vendas">Vendas</Link>
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link fw-bold" to="/">Estoque</Link>

@@ -161,6 +161,18 @@ class FaturarVenda(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+    
+class GerarPedido(APIView):
+    def post(self,request,id):
+        orcamento = get_object_or_404(Venda,id=id)
+
+        pedido = sv.GerarPedidoService.execute(orcamento)
+
+        serializer = sz.VendaSerializer(pedido)        
+        return Response(serializer.data,status=status.HTTP_200_OK)
+        
+
+
 class EstornarVenda(APIView):
     def patch(self,request,id):
         venda_estornar = get_object_or_404(Venda,id=id)
@@ -197,6 +209,17 @@ class GerarItemVenda(APIView):
         venda = get_object_or_404(Venda,id=id)
         serializer = sz.VendaSerializer(venda)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+class CancelarVenda(APIView):
+    def post(self,request,id):
+        venda = get_object_or_404(Venda,id=id)
+        serializer = sz.VendaSerializer(venda,data=request.data)
+        
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
 
 # ------------------- FINANCEIRO -----------------
 

@@ -71,8 +71,10 @@ class VendaFaturarService:
     @staticmethod
     @transaction.atomic
     def execute(venda: ml.Venda,data):    
-        if venda.status == ml.Venda.TipoVenda.FATURADO:
+        if venda.status == ml.StatusVenda.FATURADO:
             raise ValidationError("Venda já Faturada")
+        if venda.tipo_venda == ml.TipoVenda.ORCAMENTO:
+            raise ValidationError("Nao é Possivel Faturar um orçamento")
         
 
         ml.Financeiro.objects.create(
@@ -161,4 +163,25 @@ class AjusteProdutoService:
         )
 
         return produto
-        
+
+#  GERAR PEDIDO
+
+class GerarPedidoService:
+    
+    @transaction.atomic
+    @staticmethod
+    def execute(venda: ml.Venda):
+
+        if venda.status == ml.StatusVenda.FATURADO:
+            raise ValidationError("Não e possivel gerar o pedido de uma venda faturada")
+        if venda.tipo_venda == ml.TipoVenda.PEDIDO:
+            raise ValidationError("Venda já e um Pedido")
+        if venda.tipo_venda == ml.TipoVenda.CANCELADO:
+            raise ValidationError("Não e possivel faturar uma venda cancelada")
+
+        print(venda.tipo_venda)
+
+        venda.tipo_venda = ml.TipoVenda.PEDIDO
+        venda.save()
+
+        return venda

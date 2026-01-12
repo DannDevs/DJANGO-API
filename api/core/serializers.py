@@ -79,7 +79,27 @@ class ItemVendaSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError('A Quantidade nao pode ser menor que zero')
         return value    
-    
+
+
+class CancelarVendaSerializer(serializers.ModelSerializer):
+    financeiro = FinanceiroSerializer(
+        source='financeiro_set',
+        many='True',
+        read_only=True
+    )
+    justificativa = serializers.CharField(
+        min_length=10,
+        required=True,
+        write_only=True
+        )
+
+    class Meta:
+        model = Venda
+        fields = ['id','tipo_venda','status','financeiro','justificativa']
+        extra_kwargs = [
+
+        ]
+
 
 class VendaSerializer(serializers.ModelSerializer):
     
@@ -97,7 +117,7 @@ class VendaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Venda
-        fields = ['id','status','cliente','vendedor','valor_total','financeiro','itens']
+        fields = ['id','tipo_venda','status','cliente','vendedor','valor_total','financeiro','itens']
     
     def validate_valor_total(self,value):
         if value < 0:
@@ -166,13 +186,9 @@ class MovimentoSerializer(serializers.ModelSerializer):
         source='produto.descricao',
         read_only=True
     )
-    print(produto_nome)
     class Meta:
         model = Movimento
         fields = ['id','produto','produto_nome','tipo_mov','quantidade_mov','valor_mov']
-
-
-
 
 class AjusteProdutoSerializer(serializers.ModelSerializer):
     

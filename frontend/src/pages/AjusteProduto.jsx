@@ -120,7 +120,7 @@ function AjusteProduto() {
                             data={[
                                 { value: "E", label: "+" },
                                 { value: "S", label: "-" },
-                                { value: "R", label: "$" },
+                                { value: "C", label: "$" },
                             ]}
                             value={tipomov}
                             onChange={SetTipomov}
@@ -128,6 +128,7 @@ function AjusteProduto() {
                     </div>
                     <div className="text-start mt-1">
                         <NumberInput
+                            disabled={tipomov === "C"}
                             className="inputq"
                             withAsterisk
                             label="Quantidade"
@@ -141,6 +142,7 @@ function AjusteProduto() {
                     </div>
                     <div className="text-start mt-1">
                         <NumberInput
+                            disabled={tipomov === "E" || tipomov == "S"}
                             className="inputq"
                             withAsterisk
                             label="Preco"

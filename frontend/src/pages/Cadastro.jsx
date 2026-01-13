@@ -121,6 +121,8 @@ function Cadastro() {
               <div className="divisaoinputs">
                 <label className="fw-bold form-label-custom">Referencia</label>
                 <input
+                  value={form.referencia}
+                  onChange={handleChange}
                   className="input form-control-custom"
                   name="referencia"
                   type="text"
@@ -148,7 +150,7 @@ function Cadastro() {
               </div>
             </div>
             <div className="buttons mt-3">
-              <Button className="btns" filled disabled={disabled}>
+              <Button type="submit" className="btns" filled disabled={disabled}>
               {disabled ? 'Enviando...' : 'Cadastrar'}
               </Button>
             </div>

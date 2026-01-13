@@ -10,6 +10,7 @@ import ArchiveIcon from '../components/icons/ArchiveIcons';
 import SearchIcon from '../components/icons/SearchIcon';
 function Produto() {
   const [produtos, setProdutos] = useState([]);
+  const [pesquisa,setPesquisa] = useState("");
 
 
 
@@ -207,8 +208,8 @@ else {
             </div>
           </div>
           <div className='pesquisadiv d-flex'>
-            <TextInput></TextInput>
-            <Button variant='filled' className='ms-4' onClick={filtrar}><SearchIcon /></Button>
+            <TextInput value={pesquisa} onChange={(e) => setPesquisa(e.target.value)}></TextInput>
+            <Button variant='filled' className='ms-4' onClick={() => filtrar(pesquisa)}><SearchIcon /></Button>
           </div>
           <div>
             {<Button variant="filled" className='me-4' onClick={carregarProdutos}><RefreshIcon color="white" /></Button>}

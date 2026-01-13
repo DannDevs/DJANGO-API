@@ -4,3 +4,16 @@
     justify-content: center;
     flex-direction: column;
 }
+.cabeçalho{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: start;
+    min-width: 120vh;
+}
+.controles{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-evenly;
+}

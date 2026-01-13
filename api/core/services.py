@@ -15,7 +15,7 @@ class ProdutoCadastroService:
         )
         movimento = ml.Movimento.objects.create(
             produto=produto,
-            tipo_mov=ml.Movimento.Tipo.ENTRADA,
+            tipo_mov=ml.TipoMov.ENTRADA,
             quantidade_mov=produto.saldo,
             valor_mov=produto.preco
         )
@@ -153,6 +153,8 @@ class AjusteProdutoService:
         if tipo_mov == "E":
             produto.saldo += quantidade
         
+        if tipo_mov == "C":
+            produto.preco = valor 
         produto.save()
 
         movimento = ml.Movimento.objects.create(

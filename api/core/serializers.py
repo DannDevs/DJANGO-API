@@ -193,7 +193,7 @@ class MovimentoSerializer(serializers.ModelSerializer):
 class AjusteProdutoSerializer(serializers.ModelSerializer):
     
     tipo_mov = serializers.ChoiceField(
-        choices=['E','S'],
+        choices=['E','S','C'],
         write_only=True
     )
     quantidade = serializers.DecimalField(max_digits=8,decimal_places=2,write_only=True)

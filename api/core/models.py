@@ -61,14 +61,18 @@ class Venda(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
     valor_total = models.DecimalField(max_digits=10,decimal_places=2,default=0)
+    just_cancelamento = models.CharField(max_length=200,blank=True)
 
 class ItemVenda(models.Model):
     
-    venda = models.ForeignKey(Venda,on_delete=models.CASCADE)
+    venda = models.ForeignKey(Venda,on_delete=models.CASCADE,related_name="itens")
     produto = models.ForeignKey(Produto,on_delete=models.PROTECT)
     valor_item = models.DecimalField(max_digits=8,decimal_places=2)
     quantidade_item = models.DecimalField(max_digits=8,decimal_places=2)
     sub_total = models.DecimalField(max_digits=8,decimal_places=2,default=0)
+
+    def __str__(self):
+        return f"{self.produto.id} - {self.produto.descricao}"
 
 
 class Financeiro(models.Model):

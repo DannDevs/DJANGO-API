@@ -181,9 +181,45 @@ class GerarPedidoService:
         if venda.tipo_venda == ml.TipoVenda.CANCELADO:
             raise ValidationError("Não e possivel faturar uma venda cancelada")
 
-        print(venda.tipo_venda)
-
         venda.tipo_venda = ml.TipoVenda.PEDIDO
+        venda.save()
+
+        return venda
+
+class CancelarPedidoService:
+    
+    @staticmethod
+    @transaction.atomic
+    def execute(venda: ml.Venda,data):
+
+        justificativa = data["justificativa"]
+
+        if len(justificativa) <= 10:
+            raise ValidationError("Justificativa nao pode ter menos de 10 caracteres")
+
+        if venda.status == ml.StatusVenda.FATURADO:
+            raise ValidationError("Nao e possivel cancelar uma venda Faturada")
+
+        if venda.status == ml.StatusVenda.CANCELADO:
+            raise ValidationError("Nao e possivel cancelar uma venda já cancelada")
+
+        for i in venda.itens.all():
+            
+            produto = i.produto
+            produto.saldo += i.quantidade_item
+            produto.save()
+
+            ml.Movimento.objects.create(
+            produto=i.produto,
+            tipo_mov=ml.TipoMov.ENTRADA,
+            quantidade_mov=i.quantidade_item,
+            valor_mov=i.valor_item
+            )
+
+
+        venda.status = ml.StatusVenda.CANCELADO
+        venda.just_cancelamento = justificativa
+
         venda.save()
 
         return venda

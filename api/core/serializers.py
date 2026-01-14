@@ -81,24 +81,17 @@ class ItemVendaSerializer(serializers.ModelSerializer):
         return value    
 
 
-class CancelarVendaSerializer(serializers.ModelSerializer):
-    financeiro = FinanceiroSerializer(
-        source='financeiro_set',
-        many='True',
-        read_only=True
-    )
+class CancelarVendaSerializer(serializers.Serializer):
     justificativa = serializers.CharField(
         min_length=10,
-        required=True,
-        write_only=True
+        required=True
         )
 
-    class Meta:
-        model = Venda
-        fields = ['id','tipo_venda','status','financeiro','justificativa']
-        extra_kwargs = [
 
-        ]
+    # def validate_justificativaR(self,valor):
+    #     if len(valor) <= 15:
+    #         raise serializers.ValidationError('A justificativa deve ter mais de 15 caracteres')
+
 
 
 class VendaSerializer(serializers.ModelSerializer):
@@ -110,14 +103,13 @@ class VendaSerializer(serializers.ModelSerializer):
     )
     
     itens = ItemVendaSerializer(
-        source ='itemvenda_set',
         many=True,
         read_only=True
     )
 
     class Meta:
         model = Venda
-        fields = ['id','tipo_venda','status','cliente','vendedor','valor_total','financeiro','itens']
+        fields = ['id','tipo_venda','status','cliente','vendedor','valor_total','just_cancelamento','financeiro','itens']
     
     def validate_valor_total(self,value):
         if value < 0:

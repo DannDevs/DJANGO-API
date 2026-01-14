@@ -218,6 +218,15 @@ class CancelarVenda(APIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data,status=status.HTTP_200_OK)
+    def patch(self,request,id):
+        venda = get_object_or_404(Venda,id=id)
+        serializer = sz.CancelarVendaSerializer(venda,data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        sv.CancelarPedidoService.execute(venda,data=serializer.validated_data)
+
+        return Response({"message":"Venda Cancelada Com Sucesso"},status=status.HTTP_200_OK)
 
 
 

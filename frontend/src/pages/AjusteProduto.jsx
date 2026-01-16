@@ -7,8 +7,7 @@ import { showNotification } from "@mantine/notifications";
 import './AjusteProduto.css'
 import { useEffect, useState } from "react";
 import { IconCheck, IconX } from '@tabler/icons-react';
-
-
+import ArchiveIcon from "../components/icons/ArchiveIcons";
 
 
 
@@ -24,7 +23,11 @@ function AjusteProduto() {
         movimentos(id);
     }, [id]);
 
-
+    const limparcampos = () => {
+        SetTipomov("E");
+        SetQuantidade(0);
+        SetValor(0);
+    }
 
     const ajustarproduto = (id) => {
 
@@ -60,9 +63,8 @@ function AjusteProduto() {
                         radius: 'md',
                         autoClose: 3000,
                         icon: <IconCheck />,
-                    }
-
-                    )
+                    })
+                    limparcampos()
                 }
                 else {
                     showNotification({
@@ -84,9 +86,12 @@ function AjusteProduto() {
                         radius: 'md',
                         autoClose: 3000,
                         icon: <IconX />,
+
                     })
+                    limparcampos()
                 }
                 movimentos(id)
+
             }
             )
     }
@@ -174,7 +179,14 @@ function AjusteProduto() {
                                 <Table.Tr key={p.id}>
                                     <Table.Td>{p.id}</Table.Td>
                                     <Table.Td>{p.produto_nome}</Table.Td>
-                                    <Table.Td>{p.tipo_mov}</Table.Td>
+                                    <Table.Td>{p.tipo_mov === "E" ? (
+                                        <p>+</p> )
+                                        : p.tipo_mov === "S" ? (
+                                        <p>-</p>    
+                                        ) : p.tipo_mov === "C" ? (
+                                            <p>$</p>
+                                        )}
+                                    </Table.Td>
                                     <Table.Td>{p.quantidade_mov}</Table.Td>
                                     <Table.Td>{p.valor_mov}</Table.Td>
                                 </Table.Tr>

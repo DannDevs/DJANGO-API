@@ -21,7 +21,6 @@ class ProdutoCadastroService:
         )
         return produto
 
-
 class FinanceiroBaixarService:
     
     @staticmethod
@@ -75,6 +74,8 @@ class VendaFaturarService:
             raise ValidationError("Venda já Faturada")
         if venda.tipo_venda == ml.TipoVenda.ORCAMENTO:
             raise ValidationError("Nao é Possivel Faturar um orçamento")
+        if venda.tipo_venda == ml.TipoVenda.CANCELADO:
+            raise ValidationError("Não e possivel faturar uma venda cancelada")
         
 
         ml.Financeiro.objects.create(
@@ -85,11 +86,8 @@ class VendaFaturarService:
                     valor=venda.valor_total
                 )
 
-
         venda.status = ml.Venda.TipoVenda.FATURADO
-        venda.save()
-
-       
+        venda.save()       
 
         return venda
 
@@ -108,6 +106,9 @@ class ItemVendaService:
 
         if produto.saldo < quantidade:
             raise ValidationError({"detail":"Saldo Insuficiente"})
+        
+        if venda.tipo_venda == ml.TipoVenda.CANCELADO:
+            raise ValidationError("Não e possivel faturar uma venda cancelada")
 
         total = valor * quantidade
 
@@ -145,7 +146,7 @@ class AjusteProdutoService:
         tipo_mov = data["tipo_mov"]
         quantidade = data["quantidade"]
         valor = data["valor"]
-
+        
         if tipo_mov == "S":
             if produto.saldo < quantidade:
                 raise ValidationError({"detail: Saldo Insuficiente"})

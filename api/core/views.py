@@ -17,7 +17,12 @@ from core import services as sv
 
 class ProdutoView(APIView):
     def get(self,request):
+        descricao = request.query_params.get('descricao')
         produtos = Produto.objects.all()
+
+        if descricao:
+            produtos = produtos.filter(descricao__icontains=descricao)
+
         serializer = sz.ProdutoSerializer(produtos,many=True)
         return Response(serializer.data)
 
@@ -268,5 +273,4 @@ class FinancerioEdit(APIView):
         serializer = sz.FinanceiroSerializer(duplicata)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
-
 # ---------------------------------------------------------------------

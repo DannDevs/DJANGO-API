@@ -190,7 +190,7 @@ else {
       return
     }
     console.log(valor)
-    fetch(`http://127.0.0.1:8000/produtos/${valor}`)
+    fetch(`http://127.0.0.1:8000/produtos/?descricao=${valor}`)
     .then(res => res.json())
     .then(data=> setProdutos(data.produto ?? data))
   }

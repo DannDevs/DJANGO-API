@@ -180,12 +180,12 @@ function AjusteProduto() {
                                     <Table.Td>{p.id}</Table.Td>
                                     <Table.Td>{p.produto_nome}</Table.Td>
                                     <Table.Td>{p.tipo_mov === "E" ? (
-                                        <p>+</p> )
-                                        : p.tipo_mov === "S" ? (
-                                        <p>-</p>    
-                                        ) : p.tipo_mov === "C" ? (
-                                            <p>$</p>
-                                        )}
+                                        <p>+</p> 
+                                    ) : p.tipo_mov === "S" ? (
+                                        <p>-</p>
+                                    ) : p.tipo_mov === "C" ? (
+                                        <p>$</p>
+                                    ): null}
                                     </Table.Td>
                                     <Table.Td>{p.quantidade_mov}</Table.Td>
                                     <Table.Td>{p.valor_mov}</Table.Td>

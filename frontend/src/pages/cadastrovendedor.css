@@ -1,0 +1,13 @@
+.acoes{
+    display: flex;
+    justify-content: end;
+}
+.form-container{
+    width: 35em;
+    height: 35em;
+    border: 1px solid gray;
+    border-radius: 30px;
+}
+/* .formcadastro{
+
+} */

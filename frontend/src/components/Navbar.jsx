@@ -43,7 +43,7 @@ function Navbar() {
                                 <Link className="nav-link fw-bold" to="/">Clientes</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link fw-bold" to="/">Vendedores</Link>
+                                <Link className="nav-link fw-bold" to="/vendedores">Vendedores</Link>
                             </li>
                         </ul>
                     </div>

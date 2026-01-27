@@ -14,11 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView
+)
 from django.contrib import admin
 from django.urls import path
 from core import views
  
 urlpatterns = [
+    path('api/registro/',views.Registro.as_view(),name='registo'),
+    path('api/login/',views.Login.as_view(),name='token_obtain_pair'),
+    path('api/token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
     path('admin/', admin.site.urls),
     path('produtos/',views.ProdutoView.as_view(),name='produtos'),
     path('produtos/cadastro/',views.CadastroProduto.as_view(),name='cadastroproduto'),
@@ -32,6 +40,8 @@ urlpatterns = [
     path('vendedores/',views.VendedorView.as_view(),name='vendedores'),
     path('vendedores/<int:id>',views.VendedorEdit.as_view(),name='editarvendedor'),
     path('vendedores/cadastro/',views.CadastroVendedor.as_view(),name='cadastrovendedor'),
+    path('vendedores/ativar/<int:id>',views.AtivarVendedor.as_view(),name='ativarvendedor'),
+    path('vendedores/inativar/<int:id>',views.InativarVendedor.as_view(),name='inativarvendedor'),
     path('vendas/',views.VendaView.as_view(),name='vendas'),
     path('vendas/itens/<int:idvenda>',views.VendaViewItens.as_view(),name='itensvenda'),
     path('vendas/gerarvenda/',views.GerarVenda.as_view(),name='gerarvenda'),

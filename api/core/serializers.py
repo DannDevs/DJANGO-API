@@ -3,8 +3,64 @@ from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeir
 from django.db import transaction
 from django.shortcuts import render,get_object_or_404
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.models import User
 
 
+#  LOGIN SERILIAZER
+
+class LoginSerialiazer(TokenObtainPairSerializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if not email or not password:
+            raise serializers.ValidationError("Email e senha são obrigatórios")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Email ou senha inválidos")
+
+        if not user.check_password(password):
+            raise serializers.ValidationError("Email ou senha inválidos")
+
+        data = super().validate({
+            'username': user.username,
+            'password': password
+        })
+
+        data['email'] = user.email
+        data['user_id'] = user.id
+
+        return data
+
+#  ------------ REGISTRO SERIALIZER --------------
+
+class RegisterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['username','email','password']
+        extra_kwargs = {
+            'email': {'required':True}
+        }
+
+    def validate_email(self,value):
+        
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError({"detail":"Email já Cadastrado"})
+        if len(value) < 20:
+            raise serializers.ValidationError({"detail":"Tamanho menor que 20"})
+        return value
+            
+    def validate_password(self,value):
+        if len(value) < 5:
+            raise serializers.ValidationError({"detail":"Senha muito curta"})
+        return value
 # ------------ FINANCERIO SERIALIZER ---------------
 
 
@@ -127,7 +183,7 @@ class VendedorSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("O nome deve ter mais de 3 caracteres")
         return value
 
-# -------------- CLIENTE SERIALIZER ---------------------
+# -------------- CLIENTE SERIALIZER ---------------------+
 
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:

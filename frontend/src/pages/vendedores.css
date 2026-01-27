@@ -1,0 +1,25 @@
+
+.divcentral{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: row;
+    min-width: 120vh;
+}
+.pesquisador{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 30%;
+}
+.title{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+.tabelavendedor{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

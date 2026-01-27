@@ -4,6 +4,50 @@ from core import models as ml
 from django.shortcuts import render,get_object_or_404
 from decimal import Decimal
 
+from django.contrib.auth.models import User
+
+
+class RegistroService:
+    
+    @transaction.atomic
+    def cadastro(username,email,password):
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        return user
+
+
+
+class VendedorInativarService:
+
+    @staticmethod
+    @transaction.atomic
+    def execute(vendedor: ml.Vendedor):
+        if vendedor.ativo == ml.AtivoMixin.Status.INATIVO:
+            raise ValidationError({"detail":"Vendedor já esta inativo"})
+        if vendedor.ativo == ml.AtivoMixin.Status.ATIVO:
+            vendedor.ativo = ml.AtivoMixin.Status.INATIVO
+            vendedor.save()    
+        return vendedor
+
+class VendedorAtivarService:
+
+    @staticmethod
+    @transaction.atomic
+    def execute(vendedor: ml.Vendedor):
+
+        if vendedor.ativo == ml.AtivoMixin.Status.ATIVO:
+            raise ValidationError({"detail":"Vendedor Já esta ativo"})
+        
+        if vendedor.ativo == ml.AtivoMixin.Status.INATIVO:
+            vendedor.ativo = ml.AtivoMixin.Status.ATIVO
+            vendedor.save()
+        
+        return vendedor
+
+
 class ProdutoCadastroService:
     
     @staticmethod

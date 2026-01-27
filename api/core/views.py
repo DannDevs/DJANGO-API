@@ -3,19 +3,45 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render
 
 from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro
 from core import serializers as sz
 from core import services as sv
 
+# ---------------------- LOGIN ----------
+class Login(TokenObtainPairView):
+    serializer_class = sz.LoginSerialiazer
+
+
+# ------------- CADASTRO USUARIO -------------
+class Registro(APIView):
+    def post(self,request):
+        serializer = sz.RegisterSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        print(serializer.validated_data)
+
+        user = sv.RegistroService.cadastro(**serializer.validated_data)
+
+        return Response({"msg":"Usuario Criado com sucesso"},status=status.HTTP_201_CREATED)
+
+
 
 # -------------- LISTAR PRODUTOS -------------------
 
 class ProdutoView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
     def get(self,request):
         descricao = request.query_params.get('descricao')
         produtos = Produto.objects.all()
@@ -117,11 +143,19 @@ class CadastroCliente(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 # -------------- VENDEDORES --------------------------
+
 class VendedorView(APIView):
     def get(self,request):
         vendedores = Vendedor.objects.all()
+        nome = request.query_params.get('nome')
+        
+        if nome:
+            vendedores = vendedores.filter(nome__icontains=nome)
+
         serializer = sz.VendedorSerializer(vendedores,many=True)
+        
         return Response(serializer.data,status=status.HTTP_200_OK)
+
 class VendedorEdit(APIView):
     def get(self,request,id):
         vendedor = get_object_or_404(Vendedor,id=id)
@@ -137,6 +171,22 @@ class CadastroVendedor(APIView):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+class InativarVendedor(APIView):
+    def post(self,request,id):
+        vendedor = get_object_or_404(Vendedor,id=id)
+
+        sv.VendedorInativarService.execute(vendedor)    
+
+        return Response({"Sucesso":F"Vendedor {id} Inativado com sucesso"})
+
+class AtivarVendedor(APIView):
+    def post(self,request,id):
+        vendedor = get_object_or_404(Vendedor,id=id)
+
+        sv.VendedorAtivarService.execute(vendedor)
+
+        return Response({'Sucesso':f"Vendedor {id} Ativado com sucesso"},status=status.HTTP_200_OK)
 
 # -------------- VENDA ----------------------------
 

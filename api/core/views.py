@@ -5,16 +5,20 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 
-from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro
+from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada
 from core import serializers as sz
 from core import services as sv
+
+
+
 
 # ---------------------- LOGIN ----------
 class Login(TokenObtainPairView):
@@ -35,12 +39,24 @@ class Registro(APIView):
         return Response({"msg":"Usuario Criado com sucesso"},status=status.HTTP_201_CREATED)
 
 
+class QuantidadeVenda(APIView):
+    def get(self,request):
+        total_vendas = Venda.objects.all().count()
+        
+        serializer = sz.QuantidadeVendaSerializer({
+            "total_vendas":total_vendas
+        })
+
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+
 
 # -------------- LISTAR PRODUTOS -------------------
 
 class ProdutoView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self,request):
         descricao = request.query_params.get('descricao')
@@ -161,16 +177,28 @@ class VendedorEdit(APIView):
         vendedor = get_object_or_404(Vendedor,id=id)
         serializer = sz.VendedorSerializer(vendedor)
         return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def patch(self,request,id):
+        vendedor = get_object_or_404(Vendedor,id=id)
+        serializer = sz.VendedorSerializer(vendedor,data=request.data,partial=True)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
     def delete(self,request,id):
         vendedor = get_object_or_404(Vendedor,id=id).delete()
         return Response(f"Vendedor {id} deletado com sucesso",status=status.HTTP_200_OK)
 class CadastroVendedor(APIView):
     def post(self,request):
         serializer = sz.VendedorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
 
 class InativarVendedor(APIView):
     def post(self,request,id):
@@ -324,3 +352,26 @@ class FinancerioEdit(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 # ---------------------------------------------------------------------
+
+class FornecedorView(APIView):
+    def get(self,request):
+        fornecedores = Fornecedor.objects.all()
+        serializer = sz.FornecedorSerializer(fornecedores,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    def post(self,request):
+        serializer = sz.FornecedorSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+class FornecedorViewUnico(APIView):
+    def get(self,request,id):
+        fornecedor = get_object_or_404(Fornecedor,id=id)
+        serializer = sz.FornecedorSerializer(fornecedor)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class InativarFornecedor(APIView):
+    def post(self,request,id):
+        pass
+class AtivarFornecedor(APIView):
+    def post(self,request,id):
+        pass

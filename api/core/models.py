@@ -16,6 +16,11 @@ class StatusVenda(models.TextChoices):
     ABERTO = 'A','Aberto',
     FATURADO = 'F','Faturado',
     CANCELADO = 'C','Cancelado'
+class CargosVendedor(models.TextChoices):
+    VENDEDORJ = 'J','VendedorJ',
+    VENDEDORS = 'S','VendedorS',
+    REPRESENTANTE = 'R','Representante',
+    GERENTE = 'G','Gerente'
 
 
 class AtivoMixin(models.Model):
@@ -43,9 +48,17 @@ class Produto(AtivoMixin):
 
 class Cliente(AtivoMixin):
     nome = models.CharField(max_length=90)
+    cpfcnpj = models.CharField(max_length=18,default=0)
 
 class Vendedor(AtivoMixin):
     nome = models.CharField(max_length=90)
+    email = models.CharField(max_length=90,null=True)
+    cargo = models.CharField(max_length=1,choices=CargosVendedor.choices,null=True)
+
+class Fornecedor(AtivoMixin):
+    razao_social = models.CharField(max_length=120)
+    email = models.CharField(max_length=90)
+    cnpjcpf = models.CharField(max_length=18)    
  
 class Movimento(models.Model):
 
@@ -94,9 +107,40 @@ class Financeiro(models.Model):
     vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
     valor = models.DecimalField(max_digits=10,decimal_places=2)
 
+class Entrada(models.Model):
 
-# class caixa_mov(models.Model):
-# 
+    class StatusNota(models.TextChoices):
+        PRENOTA = 'A','PreNota'
+        NOTAPROCESSADA = 'P','NotaProcessada'
+
+    tipo = models.CharField(max_length=1,choices=StatusNota.choices)
+    valor_nota = models.DecimalField(max_digits=8,decimal_places=2)
+    fornecedor = models.ForeignKey(Fornecedor,on_delete=models.PROTECT)
+    razao_social = models.CharField(max_length=90,blank=True)
+    frete = models.DecimalField(max_digits=8,decimal_places=2)
+
+    def save(self,*args,**kwargs):
+        if self.fornecedor:
+            self.razao_social = self.fornecedor.razao_social
+
+class ItensEntrada(models.Model):
+    entrada =models.ForeignKey(
+        Entrada,
+        on_delete=models.CASCADE,
+        related_name='itens'
+    )
+
+    produto = models.ForeignKey(Produto,on_delete=models.PROTECT)
+    valor_item = models.DecimalField(max_digits=8,decimal_places=2)
+    descricao = models.CharField(max_length=255,blank=True)
+    quantidade_item = models.DecimalField(max_digits=8,decimal_places=2)
+
+
+    def save(self,*args,**kwargs):
+        if self.produto:
+            self.descricao = self.produto.descricao
+        super.save(*args,**kwargs)
+
 
 
 

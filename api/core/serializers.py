@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro
+from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada
 from django.db import transaction
 from django.shortcuts import render,get_object_or_404
 
@@ -61,6 +61,24 @@ class RegisterSerializer(serializers.ModelSerializer):
         if len(value) < 5:
             raise serializers.ValidationError({"detail":"Senha muito curta"})
         return value
+
+
+#  ------------- Total Vendas -------------
+
+class QuantidadeVendaSerializer(serializers.Serializer):
+
+    total_vendas = serializers.IntegerField(
+        read_only=True
+    )
+
+    class Meta:
+        fields = ['total_vendas']
+
+    def validate_total_vendas(self,value):
+        if value <= 0:
+            raise serializers.ValidationError({"msg":"Nenhum Resultado Encontrado"})
+        return value
+
 # ------------ FINANCERIO SERIALIZER ---------------
 
 
@@ -174,9 +192,20 @@ class VendaSerializer(serializers.ModelSerializer):
 # ------------- VENDEDOR SERIALIZER ----------------------
 
 class VendedorSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Vendedor
-        fields = ['id','ativo','nome']
+        fields = ['id','ativo','nome','email','cargo']
+        extra_kwargs = {
+            'email': {'required':True},
+            'cargo':{'required':True},
+        }
+
+    def validate_cargo(self,value):
+        if value != 'J' and value != 'S' and value != 'R' and value != 'G':
+            raise serializers.ValidationError({"msg":"Escolha nao e valida! J,S,R,G"})
+        return value
+
 
     def validate_nome(self,value):
         if len(value) <= 3:
@@ -262,7 +291,14 @@ class AjusteProdutoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'Valor':'O Preço nao pode ser menor que zero'})
         return data
 
-  
 
-
+class FornecedorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fornecedor
+        fields = ['id','ativo','razao_social','email','cnpjcpf']
     
+    def validate_razao_social(self,value):
+        if len(value) <= 4:
+            raise serializers.ValidationError({'msg':'A Razao deve ter mais de 4 caracteres'})
+        return value
+

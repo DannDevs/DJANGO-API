@@ -1,8 +1,14 @@
 .cards{
-    min-width: 70vh;
+    min-width: 120vh;
     justify-content: row;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding-bottom: 200px;
+}
+.inputs-home{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
 }

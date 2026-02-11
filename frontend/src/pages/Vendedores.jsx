@@ -167,6 +167,36 @@ function Vendedores() {
         carregarVendedores()
     }, [])
 
+    const deletarvendedor = (id) => {
+        fetch(`http://127.0.0.1:8000/vendedores/${id}`, {
+            method: "DELETE",
+        }
+        ).then(res => {
+            if (res.ok) {
+                showNotification({
+                    title:"Sucesso",
+                    message: 'Vendedor Foi Deletado com Sucesso',
+                    color: 'green',
+                    styles: (theme) => ({
+                        closeButton: {
+                            backgroundColor: '#202020',
+                        },
+                        root: {
+                            backgroundColor: '#202020',
+                            color: '#ffffffe5',
+                        },
+                        title: {
+                            color: '#fff',
+                        },
+                    }),
+                    radius: 'md',
+                    autoClose: 3000,
+                    icon: <IconCheck />,
+            })
+            carregarVendedores()
+            }
+        })
+    }
     return (
         <>
             <Navbar />
@@ -181,7 +211,7 @@ function Vendedores() {
                     <div className="divfinal">
                         <Button className="me-3" onClick={carregarVendedores}><RefreshIcon color={"white"} /> </Button>
                         <Link to={"/vendedores/cadastro"}>
-                         <Button>Cadastrar</Button>
+                            <Button>Cadastrar</Button>
                         </Link>
                     </div>
                 </div>
@@ -192,6 +222,8 @@ function Vendedores() {
                                 <Table.Th className="text-center">Ativo</Table.Th>
                                 <Table.Th className="text-center">Codigo</Table.Th>
                                 <Table.Th className="text-center">Nome</Table.Th>
+                                <Table.Th className="text-center">Cargo</Table.Th>
+                                <Table.Th className="text-center">E-mail</Table.Th>
                                 <Table.Th className="text-center">Açoes</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
@@ -204,6 +236,13 @@ function Vendedores() {
                                         <StatusIcon color={'red'} />}</Table.Td>
                                     <Table.Td>{vendedor.id}</Table.Td>
                                     <Table.Td>{vendedor.nome}</Table.Td>
+                                    <Table.Td>{vendedor.cargo === 'G' ? 'Gerente' :
+                                        vendedor.cargo === 'J' ? 'Junior' :
+                                            vendedor.cargo === 'S' ? 'Senior' :
+                                                vendedor.cargo === 'R' ? 'Rep' :
+                                                    'N/A'
+                                    }</Table.Td>
+                                    <Table.Td>{vendedor.email}</Table.Td>
                                     <Table.Td>
                                         <Menu>
                                             <Menu.Target>
@@ -213,11 +252,12 @@ function Vendedores() {
                                                 <Menu.Item onClick={() => ativar(vendedor)}>Ativar</Menu.Item>
                                                 <Menu.Item onClick={() => inativar(vendedor)}>Inativar</Menu.Item>
                                                 <Menu.Item>Editar</Menu.Item>
+                                                <Menu.Item onClick={() => deletarvendedor(vendedor.id) }>Excluir</Menu.Item>
                                             </Menu.Dropdown>
                                         </Menu>
                                     </Table.Td>
                                 </Table.Tr>
-                               
+
                             )}
                         </Table.Tbody>
                     </Table>

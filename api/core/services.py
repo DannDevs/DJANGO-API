@@ -268,3 +268,28 @@ class CancelarPedidoService:
         venda.save()
 
         return venda
+
+
+class AtivarFornecedor:
+    @staticmethod
+    @transaction.atomic
+    def ativar(fornecedor: ml.Fornecedor):
+        if fornecedor.ativo == ml.AtivoMixin.Status.ATIVO:
+            raise ValidationError({"msg":"Não e possivel ativar um vendedor já ativo"})
+        fornecedor.ativo = ml.AtivoMixin.Status.ATIVO
+
+        fornecedor.save()
+
+        return fornecedor
+
+
+class InativarFornecedor:
+    
+    @staticmethod
+    @transaction.atomic
+    def inativar(fornecedor: ml.Fornecedor):
+        if fornecedor.ativo == ml.AtivoMixin.Status.INATIVO:
+             raise ValidationError({"msg":"Não e Possivel inativar um vendedor já inativo"})
+        fornecedor.ativo = ml.AtivoMixin.Status.INATIVO
+        fornecedor.save()
+        return fornecedor

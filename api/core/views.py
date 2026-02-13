@@ -325,10 +325,8 @@ class FinanceiroBaixar(APIView):
     def patch(self,request,id):
         duplicata = get_object_or_404(Financeiro,id=id)
         
-        serializer = sz.FinanceiroBaixarSerializer(data=request.data)
-        
+        serializer = sz.FinanceiroBaixarSerializer(data=request.data)    
         serializer.is_valid(raise_exception=True)
-   
         sv.FinanceiroBaixarService.execute(duplicata,data=serializer.validated_data)
 
         return Response({"detail":"Baixado Com Sucesso"},status=status.HTTP_200_OK)
@@ -358,20 +356,33 @@ class FornecedorView(APIView):
         fornecedores = Fornecedor.objects.all()
         serializer = sz.FornecedorSerializer(fornecedores,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
+    
     def post(self,request):
         serializer = sz.FornecedorSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data,status=status.HTTP_201_CREATED)
+
 class FornecedorViewUnico(APIView):
     def get(self,request,id):
         fornecedor = get_object_or_404(Fornecedor,id=id)
         serializer = sz.FornecedorSerializer(fornecedor)
         return Response(serializer.data,status=status.HTTP_200_OK)
+    def patch(self,request,id):
+        fornecedor = get_object_or_404(Fornecedor,id=id)
+        serializer = sz.FornecedorSerializer(fornecedor,data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 class InativarFornecedor(APIView):
     def post(self,request,id):
-        pass
+        fornecedor = get_object_or_404(Fornecedor,id=id)
+        sv.InativarFornecedor.inativar(fornecedor)
+        return Response({"msg":"Vendedor Inativo com sucesso"})
+
 class AtivarFornecedor(APIView):
     def post(self,request,id):
-        pass
+        fornecedor = get_object_or_404(Fornecedor,id=id)
+        sv.AtivarFornecedor.ativar(fornecedor)
+        return Response({"msg":"Vendedor Ativado com sucesso"})

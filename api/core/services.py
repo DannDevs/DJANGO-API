@@ -70,8 +70,13 @@ class FinanceiroBaixarService:
     @staticmethod
     @transaction.atomic
     def execute(financeiro: ml.Financeiro,data):
+        print(data)
+        
+
         if financeiro.pago == ml.Financeiro.Pago.PAGO:
             raise ValidationError("Esse Titulo já esta em Pago")
+    
+
         financeiro.pago = ml.Financeiro.Pago.PAGO
         financeiro.save()
 

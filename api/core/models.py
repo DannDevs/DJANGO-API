@@ -98,6 +98,7 @@ class Financeiro(models.Model):
     class Tipo(models.TextChoices):
         PAGAR = 'P','Pagar'
         RECEBER = 'R','Receber'
+        CREDITO = 'C','Credito'
 
 
     pago = models.CharField(max_length=1,choices=Pago.choices,default='A')
@@ -106,6 +107,11 @@ class Financeiro(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
     valor = models.DecimalField(max_digits=10,decimal_places=2)
+    saldo = models.DecimalField(max_digits=10,decimal_places=2)
+
+    def save(self,*args,**kwargs):
+        if self.valor:
+            self.saldo = valor - saldo
 
 class Entrada(models.Model):
 

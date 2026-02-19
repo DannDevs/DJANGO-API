@@ -108,12 +108,12 @@ class FinanceiroEstornarSerializer(serializers.Serializer):
 class FinanceiroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Financeiro
-        fields = ['id','pago','tipo','venda','cliente','vendedor','valor']
+        fields = ['id','pago','tipo','venda','cliente','vendedor','valor','saldo']
 
     def validate_valor(self,value):
         if value < 0:
             raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
-        return value
+        return 
     
 # ------------- VENDA SERIALIZER -------------------
 

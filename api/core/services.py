@@ -70,16 +70,25 @@ class FinanceiroBaixarService:
     @staticmethod
     @transaction.atomic
     def execute(financeiro: ml.Financeiro,data):
-        print(data)
+
+        valor_pago = data["valor_pago"]
         
-
         if financeiro.pago == ml.Financeiro.Pago.PAGO:
-            raise ValidationError("Esse Titulo já esta em Pago")
-    
+            raise ValidationError({"msg":"Esse Titulo já esta em Pago"})
+        
+        if valor_pago > financeiro.saldo_parcela:
+            raise ValidationError({"msg":f"Valor pago ${valor_pago} Maior que a parcela ${financeiro.saldo_parcela}"})
 
-        financeiro.pago = ml.Financeiro.Pago.PAGO
+        if financeiro.saldo_parcela == 0:
+            raise ValidationError({"msg":"Titulo ja está baixado"})
+
+        if valor_pago == financeiro.saldo_parcela:
+            financeiro.pago = ml.Financeiro.Pago.PAGO
+            financeiro.saldo_parcela = 0
+        elif valor_pago < financeiro.saldo_parcela:
+            financeiro.pago = ml.Financeiro.Pago.PARCIAL
+            financeiro.saldo_parcela = financeiro.saldo_parcela - valor_pago     
         financeiro.save()
-
         return financeiro
 
     
@@ -91,6 +100,7 @@ class FinanceiroEstornarService:
         if financeiro.pago == ml.Financeiro.Pago.ABERTO:
             raise ValidationError("Titulo já esta Aberto")
         financeiro.pago = ml.Financeiro.Pago.ABERTO
+        financeiro.saldo_parcela = financeiro.valor_parcela
         financeiro.save()
 
         return financeiro
@@ -101,7 +111,7 @@ class VendaEstornarService:
     @transaction.atomic
     def execute(venda: ml.Venda,data):
         
-        if venda.status == ml.Venda.TipoVenda.ABERTO:
+        if venda.status == ml.StatusVenda.ABERTO:
             raise ValidationError("Venda já esta em Aberto")
 
         if venda.financeiro_set.filter(pago='P').exists():
@@ -109,7 +119,7 @@ class VendaEstornarService:
 
         financas = ml.Financeiro.objects.filter(venda=venda)
         financas.delete()
-        venda.status = ml.Venda.TipoVenda.ABERTO
+        venda.status = ml.StatusVenda.ABERTO
         venda.save()
 
         return venda
@@ -123,7 +133,7 @@ class VendaFaturarService:
             raise ValidationError("Venda já Faturada")
         if venda.tipo_venda == ml.TipoVenda.ORCAMENTO:
             raise ValidationError("Nao é Possivel Faturar um orçamento")
-        if venda.tipo_venda == ml.TipoVenda.CANCELADO:
+        if venda.tipo_venda == ml.StatusVenda.CANCELADO:
             raise ValidationError("Não e possivel faturar uma venda cancelada")
         
 
@@ -132,10 +142,10 @@ class VendaFaturarService:
                     vendedor=venda.vendedor,
                     venda=venda,
                     tipo='R',
-                    valor=venda.valor_total
+                    valor_parcela=venda.valor_total
                 )
 
-        venda.status = ml.Venda.TipoVenda.FATURADO
+        venda.status = ml.StatusVenda.FATURADO
         venda.save()       
 
         return venda
@@ -150,13 +160,13 @@ class ItemVendaService:
         quantidade = data["quantidade_item"]
         valor = data["valor_item"]
 
-        if venda.status == ml.Venda.TipoVenda.FATURADO:
+        if venda.status == ml.StatusVenda.FATURADO:
             raise ValidationError({"detail":"Venda ja Faturada"})
 
         if produto.saldo < quantidade:
             raise ValidationError({"detail":"Saldo Insuficiente"})
         
-        if venda.tipo_venda == ml.TipoVenda.CANCELADO:
+        if venda.tipo_venda == ml.StatusVenda.CANCELADO:
             raise ValidationError("Não e possivel faturar uma venda cancelada")
 
         total = valor * quantidade
@@ -228,7 +238,7 @@ class GerarPedidoService:
             raise ValidationError("Não e possivel gerar o pedido de uma venda faturada")
         if venda.tipo_venda == ml.TipoVenda.PEDIDO:
             raise ValidationError("Venda já e um Pedido")
-        if venda.tipo_venda == ml.TipoVenda.CANCELADO:
+        if venda.tipo_venda == ml.StatusVenda.CANCELADO:
             raise ValidationError("Não e possivel faturar uma venda cancelada")
 
         venda.tipo_venda = ml.TipoVenda.PEDIDO

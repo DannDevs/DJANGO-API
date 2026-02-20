@@ -84,13 +84,19 @@ class QuantidadeVendaSerializer(serializers.Serializer):
 
 class FinanceiroBaixarSerializer(serializers.Serializer):
 
-    def validate_pago(self,value):
-        if value != Financeiro.Pago.PAGO:
-            raise serializers.ValidationError({"Pago":"Titulo ja está Pago"})
+    valor_pago = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+    )
+
+    def validate_valor_pago(self,value):
+        if value <= 0:
+            raise serializers.ValidationError({"msg":"Valor Pago nao pode ser menor que zero"})
+        return value
 
     def validate_valor(self,value):
         if value < 0:
-            raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
+            raise serializers.ValidationError('msg: Valor nao pode ser menor que zero')
         return value
 
 class FinanceiroEstornarSerializer(serializers.Serializer):
@@ -108,7 +114,7 @@ class FinanceiroEstornarSerializer(serializers.Serializer):
 class FinanceiroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Financeiro
-        fields = ['id','pago','tipo','venda','cliente','vendedor','valor','saldo']
+        fields = ['id','pago','tipo','venda','cliente','vendedor','valor_parcela','saldo_parcela']
 
     def validate_valor(self,value):
         if value < 0:

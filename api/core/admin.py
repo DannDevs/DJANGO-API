@@ -94,7 +94,8 @@ class FinanceiroAdmin(admin.ModelAdmin):
         'pago',
         'cliente',
         'vendedor',
-        'valor',
+        'valor_parcela',
+        'saldo_parcela'
     )
     list_filter = ('tipo', 'pago')
     autocomplete_fields = ('cliente', 'vendedor')

@@ -93,6 +93,7 @@ class Financeiro(models.Model):
     class Pago(models.TextChoices):
         ABERTO = 'A','Aberto'
         PAGO = 'P','Pago'
+        PARCIAL = 'C','Parcial'
         ATRASADO = 'E','Atrasado'
     
     class Tipo(models.TextChoices):
@@ -106,12 +107,13 @@ class Financeiro(models.Model):
     venda = models.ForeignKey(Venda,on_delete=models.CASCADE)
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
-    valor = models.DecimalField(max_digits=10,decimal_places=2)
-    saldo = models.DecimalField(max_digits=10,decimal_places=2)
+    valor_parcela = models.DecimalField(max_digits=10,decimal_places=2)
+    saldo_parcela = models.DecimalField(max_digits=10,decimal_places=2,default=0)
 
     def save(self,*args,**kwargs):
-        if self.valor:
-            self.saldo = valor - saldo
+        if self.saldo_parcela is None:
+            self.saldo_parcela = self.valor_parcela
+        super().save(*args,**kwargs)
 
 class Entrada(models.Model):
 

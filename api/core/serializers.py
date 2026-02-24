@@ -144,7 +144,6 @@ class VendaEstornarSerializar(serializers.ModelSerializer):
 # ------------ ITENS VENDA ------------------
 
 class ItemVendaSerializer(serializers.ModelSerializer):
-    
 
     class Meta:
         model = ItemVenda

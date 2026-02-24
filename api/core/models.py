@@ -5,6 +5,12 @@ from django.db import models
 
 #  --------------  CHOICES
 
+class AçoesFinancas(models.TextChoices):
+    BAIXA = 'B','Baixa',
+    REMBAIXA = 'R','Remocao Baixa',
+    DELETE = 'D','Delete',
+    ALTERACAO = 'A','Alteraçao',
+    CRIACAO = 'C','Criaçao'
 class TipoVenda(models.TextChoices):
     ORCAMENTO = 'O','Orcamento',
     PEDIDO = 'P','Pedido'
@@ -114,6 +120,20 @@ class Financeiro(models.Model):
         if self.saldo_parcela is None:
             self.saldo_parcela = self.valor_parcela
         super().save(*args,**kwargs)
+
+class Logfinancas(models.Model):
+
+
+    financeiro = models.ForeignKey(Financeiro,on_delete=models.SET_NULL,null=True)
+    acao = models.CharField(max_length=1,choices=AçoesFinancas.choices)
+    valor_acao = models.DecimalField(max_digits=8,decimal_places=2)
+    valor_total = models.DecimalField(max_digits=8,decimal_places=2) 
+    data = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-data']
+
+
 
 class Entrada(models.Model):
 

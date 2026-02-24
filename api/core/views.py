@@ -311,8 +311,6 @@ class CancelarVenda(APIView):
 
         return Response({"message":"Venda Cancelada Com Sucesso"},status=status.HTTP_200_OK)
 
-
-
 # ------------------- FINANCEIRO -----------------
 
 class FinanceiroView(APIView):

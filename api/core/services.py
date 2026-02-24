@@ -88,6 +88,7 @@ class FinanceiroBaixarService:
         elif valor_pago < financeiro.saldo_parcela:
             financeiro.pago = ml.Financeiro.Pago.PARCIAL
             financeiro.saldo_parcela = financeiro.saldo_parcela - valor_pago     
+        
         financeiro.save()
         return financeiro
 
@@ -308,3 +309,6 @@ class InativarFornecedor:
         fornecedor.ativo = ml.AtivoMixin.Status.INATIVO
         fornecedor.save()
         return fornecedor
+
+
+    

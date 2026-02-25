@@ -59,5 +59,6 @@ urlpatterns = [
     path('duplicatas/',views.FinanceiroView.as_view(),name='duplicatas'),
     path('duplicatas/<int:id>',views.FinancerioEdit.as_view(),name='editarduplicata'),
     path('duplicatas/baixar/<int:id>',views.FinanceiroBaixar.as_view(),name='baixarduplicata'),
-    path('duplicatas/estornar/<int:id>',views.FinanceiroEstornar.as_view(),name='estornarduplicata'),
+    path('duplicatas/rbaixar/<int:id>',views.FinanceiroEstornar.as_view(),name='estornarduplicata'),
+    path('duplicatas/logs/',views.LogFinancaView.as_view(),name='logsfinanca'),
     ]

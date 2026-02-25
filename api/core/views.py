@@ -13,7 +13,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render,get_object_or_404
 
-from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada
+from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada,Logfinancas
 from core import serializers as sz
 from core import services as sv
 
@@ -345,6 +345,12 @@ class FinancerioEdit(APIView):
     def get(self,request,id):
         duplicata = get_object_or_404(Financeiro,id=id)
         serializer = sz.FinanceiroSerializer(duplicata)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class LogFinancaView(APIView):
+    def get(self,request):
+        logs = Logfinancas.objects.all()
+        serializer = sz.LogFinancasSerializer(logs,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 # ---------------------------------------------------------------------

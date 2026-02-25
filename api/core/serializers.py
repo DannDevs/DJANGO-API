@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada
+from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada,Logfinancas
 from django.db import transaction
 from django.shortcuts import render,get_object_or_404
 
@@ -120,7 +120,12 @@ class FinanceiroSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
         return 
-    
+
+class LogFinancasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Logfinancas
+        fields = ['id','financeiro','acao','valor_acao','valor_total','data']
+
 # ------------- VENDA SERIALIZER -------------------
 
 # -------------- VENDA ------------------

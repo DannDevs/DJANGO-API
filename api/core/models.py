@@ -6,11 +6,11 @@ from django.db import models
 #  --------------  CHOICES
 
 class AçoesFinancas(models.TextChoices):
-    BAIXA = 'B','Baixa',
-    REMBAIXA = 'R','Remocao Baixa',
-    DELETE = 'D','Delete',
-    ALTERACAO = 'A','Alteraçao',
-    CRIACAO = 'C','Criaçao'
+    BAIXA = 'BAIXA','Baixa',
+    REMBAIXA = 'REMOCAO BAIXA','Remocao Baixa',
+    DELETE = 'DELETE','Delete',
+    ALTERACAO = 'ALTERACAO','Alteraçao',
+    CRIACAO = 'CRIACAO','Criaçao'
 class TipoVenda(models.TextChoices):
     ORCAMENTO = 'O','Orcamento',
     PEDIDO = 'P','Pedido'
@@ -123,9 +123,8 @@ class Financeiro(models.Model):
 
 class Logfinancas(models.Model):
 
-
     financeiro = models.ForeignKey(Financeiro,on_delete=models.SET_NULL,null=True)
-    acao = models.CharField(max_length=1,choices=AçoesFinancas.choices)
+    acao = models.CharField(max_length=13,choices=AçoesFinancas.choices)
     valor_acao = models.DecimalField(max_digits=8,decimal_places=2)
     valor_total = models.DecimalField(max_digits=8,decimal_places=2) 
     data = models.DateTimeField(auto_now_add=True)

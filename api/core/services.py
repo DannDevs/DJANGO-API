@@ -89,6 +89,13 @@ class FinanceiroBaixarService:
             financeiro.pago = ml.Financeiro.Pago.PARCIAL
             financeiro.saldo_parcela = financeiro.saldo_parcela - valor_pago     
         
+        ml.Logfinancas.objects.create(
+            financeiro =financeiro,
+            acao =ml.AçoesFinancas.BAIXA,
+            valor_acao = valor_pago,
+            valor_total = financeiro.valor_parcela
+        )
+
         financeiro.save()
         return financeiro
 
@@ -103,6 +110,15 @@ class FinanceiroEstornarService:
         financeiro.pago = ml.Financeiro.Pago.ABERTO
         financeiro.saldo_parcela = financeiro.valor_parcela
         financeiro.save()
+
+        valor_estorno = financeiro.valor_parcela * -1
+
+        ml.Logfinancas.objects.create(
+            financeiro =financeiro,
+            acao =ml.AçoesFinancas.REMBAIXA,
+            valor_acao = valor_estorno,
+            valor_total = financeiro.valor_parcela
+        )
 
         return financeiro
 
@@ -119,7 +135,16 @@ class VendaEstornarService:
             raise ValidationError({"detail":"Não e possivel remover a baixa da venda pois já possui financeiro baixado"})
 
         financas = ml.Financeiro.objects.filter(venda=venda)
+        
+        ml.Logfinancas.objects.create(
+            financeiro = financas,
+            acao =ml.AçoesFinancas.DELETE,
+            valor_acao = 0,
+            valor_total = 0
+        )
+        
         financas.delete()
+        
         venda.status = ml.StatusVenda.ABERTO
         venda.save()
 

@@ -13,7 +13,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render,get_object_or_404
 
-from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada
+from core.models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada,Logfinancas
 from core import serializers as sz
 from core import services as sv
 
@@ -384,3 +384,12 @@ class AtivarFornecedor(APIView):
         fornecedor = get_object_or_404(Fornecedor,id=id)
         sv.AtivarFornecedor.ativar(fornecedor)
         return Response({"msg":"Vendedor Ativado com sucesso"})
+
+
+# -------------------------  LOGS
+class LogsFinanca(APIView):
+    def get(self,request):
+        logs = Logfinancas.objects.all()
+        serializer = sz.LogFinancaSerializer(logs,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+

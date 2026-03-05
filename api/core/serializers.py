@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada
+from .models import Produto,Movimento,Cliente,Vendedor,Venda,ItemVenda,Financeiro,Fornecedor,ItensEntrada,Entrada,Logfinancas
 from django.db import transaction
 from django.shortcuts import render,get_object_or_404
 
@@ -307,3 +307,9 @@ class FornecedorSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'msg':'A Razao deve ter mais de 4 caracteres'})
         return value
 
+# LOGS SERIALIZER
+
+class LogFinancaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Logfinancas
+        fields = ['id','id_financa','acao','valor_acao','valor_total','data']

@@ -117,8 +117,19 @@ class VendaEstornarService:
 
         if venda.financeiro_set.filter(pago='P').exists():
             raise ValidationError({"detail":"Não e possivel remover a baixa da venda pois já possui financeiro baixado"})
+                
+        financas = ml.Financeiro.objects.get(venda=venda)
 
-        financas = ml.Financeiro.objects.filter(venda=venda)
+        log = ml.Logfinancas.objects.create(
+            financeiro=financas,
+            id_financa=financas.id,
+            acao=ml.AçoesFinancas.DELETE,
+            valor_acao=financas.valor_parcela * -1,
+            valor_total=financas.valor_parcela
+        )
+
+        GravarNumeroFinancaLog.gravar(log)
+
         financas.delete()
         venda.status = ml.StatusVenda.ABERTO
         venda.save()
@@ -138,13 +149,20 @@ class VendaFaturarService:
             raise ValidationError("Não e possivel faturar uma venda cancelada")
         
 
-        ml.Financeiro.objects.create(
+        financeiro = ml.Financeiro.objects.create(
                     cliente=venda.cliente,
                     vendedor=venda.vendedor,
                     venda=venda,
                     tipo='R',
                     valor_parcela=venda.valor_total
                 )
+        ml.Logfinancas.objects.create(
+            financeiro=financeiro,
+            id_financa=financeiro.id,
+            acao=ml.AçoesFinancas.CRIACAO,
+            valor_acao=financeiro.valor_parcela,
+            valor_total=financeiro.valor_parcela
+        )
 
         venda.status = ml.StatusVenda.FATURADO
         venda.save()       
@@ -310,5 +328,18 @@ class InativarFornecedor:
         fornecedor.save()
         return fornecedor
 
+class GravarNumeroFinancaLog:
+
+    @staticmethod
+    @transaction.atomic
+    def gravar(logfinanca: ml.Logfinancas):
+        
+        codigofinanca = logfinanca.financeiro_id
+        
+        logfinanca.id_financa = codigofinanca
+        
+        logfinanca.save()
+
+        return logfinanca
 
     

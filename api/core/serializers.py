@@ -120,7 +120,12 @@ class FinanceiroSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError('detail: Valor nao pode ser menor que zero')
         return 
-    
+
+class LogFinancasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Logfinancas
+        fields = ['id','financeiro','acao','valor_acao','valor_total','data']
+
 # ------------- VENDA SERIALIZER -------------------
 
 # -------------- VENDA ------------------

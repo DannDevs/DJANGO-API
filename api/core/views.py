@@ -346,6 +346,12 @@ class FinancerioEdit(APIView):
         duplicata = get_object_or_404(Financeiro,id=id)
         serializer = sz.FinanceiroSerializer(duplicata)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+class LogFinancaView(APIView):
+    def get(self,request):
+        logs = Logfinancas.objects.all()
+        serializer = sz.LogFinancasSerializer(logs,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
     
 # ---------------------------------------------------------------------
 

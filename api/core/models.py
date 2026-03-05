@@ -6,11 +6,11 @@ from django.db import models
 #  --------------  CHOICES
 
 class AçoesFinancas(models.TextChoices):
-    BAIXA = 'B','Baixa',
-    REMBAIXA = 'R','Remocao Baixa',
-    DELETE = 'D','Delete',
-    ALTERACAO = 'A','Alteraçao',
-    CRIACAO = 'C','Criaçao'
+    BAIXA = 'BAIXAR','Baixa',
+    REMBAIXA = 'REM BAIXA','Remocao Baixa',
+    DELETE = 'DELETE','Delete',
+    ALTERACAO = 'ALTER','Alteraçao',
+    CRIACAO = 'CREATE','Criaçao'
 class TipoVenda(models.TextChoices):
     ORCAMENTO = 'O','Orcamento',
     PEDIDO = 'P','Pedido'

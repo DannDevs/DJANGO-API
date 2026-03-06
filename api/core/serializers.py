@@ -100,7 +100,7 @@ class FinanceiroBaixarSerializer(serializers.Serializer):
         return value
 
 class FinanceiroEstornarSerializer(serializers.Serializer):
-
+    
     def validate_pago(self,value):
         if value != Financeiro.Pago.Aberto:
             raise serializers.ValidationError({"detail":"Titulo já esta em aberto"})
@@ -317,4 +317,4 @@ class FornecedorSerializer(serializers.ModelSerializer):
 class LogFinancaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Logfinancas
-        fields = ['id','id_financa','acao','valor_acao','valor_total','data']
+        fields = ['id','id_financa','acao','valor_acao','valor_saldo_parcela','valor_total','data']

@@ -231,7 +231,7 @@ class VendaViewItens(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 class FaturarVenda(APIView):
-    def patch(self,request,id):
+    def post(self,request,id):
         venda_faturar = get_object_or_404(Venda,id=id)
         serializer = sz.VendaSerializer(venda_faturar,data=request.data,partial=True)
         
@@ -343,8 +343,8 @@ class FinanceiroEstornar(APIView):
 
 class FinancerioEdit(APIView):
     def get(self,request,id):
-        duplicata = get_object_or_404(Financeiro,id=id)
-        serializer = sz.FinanceiroSerializer(duplicata)
+        duplicatas = Financeiro.objects.filter(venda=id)
+        serializer = sz.FinanceiroSerializer(duplicatas,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 class LogFinancaView(APIView):

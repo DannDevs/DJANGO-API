@@ -79,7 +79,7 @@ class FinanceiroBaixarService:
         if valor_pago > financeiro.saldo_parcela:
             raise ValidationError({"msg":f"Valor pago ${valor_pago} Maior que a parcela ${financeiro.saldo_parcela}"})
 
-        if financeiro.saldo_parcela == 0:
+        if financeiro.saldo_parcela <= 0:
             raise ValidationError({"msg":"Titulo ja está baixado"})
 
         if valor_pago == financeiro.saldo_parcela:
@@ -91,8 +91,10 @@ class FinanceiroBaixarService:
         
         ml.Logfinancas.objects.create(
             financeiro =financeiro,
+            id_financa=financeiro.id,
             acao =ml.AçoesFinancas.BAIXA,
             valor_acao = valor_pago,
+            valor_saldo_parcela=financeiro.saldo_parcela,
             valor_total = financeiro.valor_parcela
         )
 
@@ -115,8 +117,10 @@ class FinanceiroEstornarService:
 
         ml.Logfinancas.objects.create(
             financeiro =financeiro,
+            id_financa=financeiro.id,
             acao =ml.AçoesFinancas.REMBAIXA,
             valor_acao = valor_estorno,
+            valor_saldo_parcela=financeiro.saldo_parcela,
             valor_total = financeiro.valor_parcela
         )
 
@@ -134,9 +138,18 @@ class VendaEstornarService:
         if venda.financeiro_set.filter(pago='P').exists():
             raise ValidationError({"detail":"Não e possivel remover a baixa da venda pois já possui financeiro baixado"})
 
-        financas = ml.Financeiro.objects.filter(venda=venda)
-        financas.delete()
+        financas = ml.Financeiro.objects.get(venda=venda)
         
+        ml.Logfinancas.objects.create(
+            financeiro=financas,
+            id_financa=financas.id,
+            acao=ml.AçoesFinancas.CRIACAO,
+            valor_acao=financas.valor_parcela * -1,
+            valor_saldo_parcela=financas.saldo_parcela,
+            valor_total=financas.valor_parcela
+        )
+
+        financas.delete()
         venda.status = ml.StatusVenda.ABERTO
         venda.save()
 
@@ -151,7 +164,7 @@ class VendaFaturarService:
             raise ValidationError("Venda já Faturada")
         if venda.tipo_venda == ml.TipoVenda.ORCAMENTO:
             raise ValidationError("Nao é Possivel Faturar um orçamento")
-        if venda.tipo_venda == ml.StatusVenda.CANCELADO:
+        if venda.status == ml.StatusVenda.CANCELADO:
             raise ValidationError("Não e possivel faturar uma venda cancelada")
         
 
@@ -160,13 +173,15 @@ class VendaFaturarService:
                     vendedor=venda.vendedor,
                     venda=venda,
                     tipo='R',
-                    valor_parcela=venda.valor_total
+                    valor_parcela=venda.valor_total,
+                    saldo_parcela=venda.valor_total
                 )
         ml.Logfinancas.objects.create(
             financeiro=financeiro,
             id_financa=financeiro.id,
             acao=ml.AçoesFinancas.CRIACAO,
             valor_acao=financeiro.valor_parcela,
+            valor_saldo_parcela=financeiro.saldo_parcela,
             valor_total=financeiro.valor_parcela
         )
 
@@ -341,9 +356,7 @@ class GravarNumeroFinancaLog:
     def gravar(logfinanca: ml.Logfinancas):
         
         codigofinanca = logfinanca.financeiro_id
-        
         logfinanca.id_financa = codigofinanca
-        
         logfinanca.save()
 
         return logfinanca

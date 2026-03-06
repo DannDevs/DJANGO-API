@@ -6,8 +6,9 @@ from django.db import models
 #  --------------  CHOICES
 
 class AçoesFinancas(models.TextChoices):
-    BAIXA = 'BAIXAR','Baixa',
-    REMBAIXA = 'REM BAIXA','Remocao Baixa',
+    BAIXA = 'BAIXADO','Baixa',
+    BAIXAPARCIAL = 'PARCIAL BAIXA'
+    REMBAIXA = 'REMO BAIXA','Remocao Baixa',
     DELETE = 'DELETE','Delete',
     ALTERACAO = 'ALTER','Alteraçao',
     CRIACAO = 'CREATE','Criaçao'
@@ -116,16 +117,13 @@ class Financeiro(models.Model):
     valor_parcela = models.DecimalField(max_digits=10,decimal_places=2)
     saldo_parcela = models.DecimalField(max_digits=10,decimal_places=2,default=0)
 
-    def save(self,*args,**kwargs):
-        if self.saldo_parcela is None:
-            self.saldo_parcela = self.valor_parcela
-        super().save(*args,**kwargs)
-
 class Logfinancas(models.Model):
 
     financeiro = models.ForeignKey(Financeiro,on_delete=models.SET_NULL,null=True)
-    acao = models.CharField(max_length=1,choices=AçoesFinancas.choices)
+    id_financa = models.IntegerField(blank=True,null=True)
+    acao = models.CharField(max_length=12,choices=AçoesFinancas.choices)
     valor_acao = models.DecimalField(max_digits=8,decimal_places=2)
+    valor_saldo_parcela = models.DecimalField(max_digits=8,decimal_places=2,null=True)
     valor_total = models.DecimalField(max_digits=8,decimal_places=2) 
     data = models.DateTimeField(auto_now_add=True)
 

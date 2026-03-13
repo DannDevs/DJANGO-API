@@ -392,6 +392,10 @@ class AtivarFornecedor(APIView):
         return Response({"msg":"Vendedor Ativado com sucesso"})
 
 
+
+
+
+
 # -------------------------  LOGS
 class LogsFinanca(APIView):
     def get(self,request):

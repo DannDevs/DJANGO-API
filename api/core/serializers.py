@@ -122,9 +122,12 @@ class FinanceiroSerializer(serializers.ModelSerializer):
         return 
 
 class LogFinancasSerializer(serializers.ModelSerializer):
+    
+    acao_exibir = serializers.CharField(source='get_acao_display',read_only=True)
+
     class Meta:
         model = Logfinancas
-        fields = ['id','financeiro','acao','valor_acao','valor_total','data']
+        fields = ['id','financeiro','acao','acao_exibir','valor_acao','valor_total','data']
 
 # ------------- VENDA SERIALIZER -------------------
 

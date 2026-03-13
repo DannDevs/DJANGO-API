@@ -72,6 +72,7 @@ class FinanceiroBaixarService:
     def execute(financeiro: ml.Financeiro,data):
 
         valor_pago = data["valor_pago"]
+        status_atual = None
         
         if financeiro.pago == ml.Financeiro.Pago.PAGO:
             raise ValidationError({"msg":"Esse Titulo já esta em Pago"})
@@ -85,14 +86,17 @@ class FinanceiroBaixarService:
         if valor_pago == financeiro.saldo_parcela:
             financeiro.pago = ml.Financeiro.Pago.PAGO
             financeiro.saldo_parcela = 0
+            status_atual = ml.AçoesFinancas.BAIXA
+            
         elif valor_pago < financeiro.saldo_parcela:
             financeiro.pago = ml.Financeiro.Pago.PARCIAL
             financeiro.saldo_parcela = financeiro.saldo_parcela - valor_pago     
-        
+            status_atual = ml.AçoesFinancas.BAIXAPARCIAL
+
         ml.Logfinancas.objects.create(
             financeiro =financeiro,
             id_financa=financeiro.id,
-            acao =ml.AçoesFinancas.BAIXA,
+            acao =status_atual,
             valor_acao = valor_pago,
             valor_saldo_parcela=financeiro.saldo_parcela,
             valor_total = financeiro.valor_parcela
@@ -167,6 +171,8 @@ class VendaFaturarService:
         if venda.status == ml.StatusVenda.CANCELADO:
             raise ValidationError("Não e possivel faturar uma venda cancelada")
         
+
+
 
         financeiro = ml.Financeiro.objects.create(
                     cliente=venda.cliente,

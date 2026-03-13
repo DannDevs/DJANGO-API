@@ -6,23 +6,27 @@ from django.db import models
 #  --------------  CHOICES
 
 class AçoesFinancas(models.TextChoices):
-    BAIXA = 'BAIXADO','Baixa',
-    BAIXAPARCIAL = 'PARCIAL BAIXA'
-    REMBAIXA = 'REMO BAIXA','Remocao Baixa',
-    DELETE = 'DELETE','Delete',
-    ALTERACAO = 'ALTER','Alteraçao',
-    CRIACAO = 'CREATE','Criaçao'
+    BAIXA = 'P','Baixa',
+    BAIXAPARCIAL = 'PP','Parcialmente Pago',
+    REMBAIXA = 'PR','Remocao Baixa',
+    DELETE = 'E','Delete',
+    ALTERACAO = 'A','Alteraçao',
+    CRIACAO = 'C','Criaçao'
+
 class TipoVenda(models.TextChoices):
     ORCAMENTO = 'O','Orcamento',
     PEDIDO = 'P','Pedido'
+
 class TipoMov(models.TextChoices):
     ENTRADA = 'E','Entrada'
     SAIDA = 'S','Saida',
     CUSTO = 'C','Custo'
+
 class StatusVenda(models.TextChoices):
     ABERTO = 'A','Aberto',
     FATURADO = 'F','Faturado',
     CANCELADO = 'C','Cancelado'
+
 class CargosVendedor(models.TextChoices):
     VENDEDORJ = 'J','VendedorJ',
     VENDEDORS = 'S','VendedorS',
@@ -121,7 +125,7 @@ class Logfinancas(models.Model):
 
     financeiro = models.ForeignKey(Financeiro,on_delete=models.SET_NULL,null=True)
     id_financa = models.IntegerField(blank=True,null=True)
-    acao = models.CharField(max_length=12,choices=AçoesFinancas.choices)
+    acao = models.CharField(max_length=2,choices=AçoesFinancas.choices)
     valor_acao = models.DecimalField(max_digits=8,decimal_places=2)
     valor_saldo_parcela = models.DecimalField(max_digits=8,decimal_places=2,null=True)
     valor_total = models.DecimalField(max_digits=8,decimal_places=2) 
@@ -149,7 +153,8 @@ class Entrada(models.Model):
             self.razao_social = self.fornecedor.razao_social
 
 class ItensEntrada(models.Model):
-    entrada =models.ForeignKey(
+    
+    entrada = models.ForeignKey(
         Entrada,
         on_delete=models.CASCADE,
         related_name='itens'
@@ -165,6 +170,8 @@ class ItensEntrada(models.Model):
         if self.produto:
             self.descricao = self.produto.descricao
         super.save(*args,**kwargs)
+
+class DevoluçaoVenda(models.Model):
 
 
 

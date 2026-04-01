@@ -171,11 +171,4 @@ class ItensEntrada(models.Model):
             self.descricao = self.produto.descricao
         super.save(*args,**kwargs)
 
-class DevoluçaoVenda(models.Model):
-
-
-
-
-
-    
-    
+# class DevoluçaoVenda(models.Model):
